@@ -306,7 +306,7 @@ File: `src/registry/index.ts`
 
 ### Task 5.1: Implement schema builder
 File: `src/engine/validation.ts`
-- [ ] Implement `buildAnswerSchema(questionnaire, answers, registry)`:
+- [x] Implement `buildAnswerSchema(questionnaire, answers, registry)`:
   - Get visible questions
   - For each visible question, get schema from registry
   - Combine into `z.object({ [questionId]: schema })`
@@ -314,15 +314,15 @@ File: `src/engine/validation.ts`
 
 ### Task 5.2: Implement validation function
 File: `src/engine/validation.ts`
-- [ ] Implement `validateAnswers(questionnaire, answers, registry?)`:
+- [x] Implement `validateAnswers(questionnaire, answers, registry?)`:
   - Build dynamic schema
   - Parse answers
   - Return `{ success: true, data }` or `{ success: false, errors }`
-- [ ] Format errors to match API error structure
+- [x] Format errors to match API error structure
 
 ### Task 5.3: Implement parse function
 File: `src/engine/validation.ts`
-- [ ] Implement `parseQuestionnaire(payload)`:
+- [x] Implement `parseQuestionnaire(payload)`:
   - Validate against `QuestionnaireDefinition` schema
   - Run cyclic dependency check
   - Return typed questionnaire or throw

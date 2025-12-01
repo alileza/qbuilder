@@ -13,4 +13,13 @@ export {
   getVisibleSections,
 } from './visibility.js';
 
-// Validation exports (will be added in Phase 5)
+// Validation exports
+export {
+  buildAnswerSchema,
+  validateAnswers,
+  parseQuestionnaire,
+  type ValidationSuccess,
+  type ValidationError,
+  type ValidationErrorDetail,
+  type ValidationResult,
+} from './validation.js';
