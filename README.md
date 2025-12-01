@@ -2,7 +2,7 @@
 
 A modular, type-safe questionnaire engine for Node.js with branching logic, validation, and versioning support.
 
-[![Tests](https://img.shields.io/badge/tests-260%20passing-brightgreen)](https://github.com/alileza/qbuilder)
+[![Tests](https://img.shields.io/badge/tests-286%20passing-brightgreen)](https://github.com/alileza/qbuilder)
 [![Coverage](https://img.shields.io/badge/coverage-86%25-green)](https://github.com/alileza/qbuilder)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -13,9 +13,10 @@ A modular, type-safe questionnaire engine for Node.js with branching logic, vali
 - ✅ **Runtime Validation**: Type-safe validation using Zod with custom error messages
 - 📦 **Extensible**: Easy to add custom question types and validation rules
 - 🗄️ **Versioning**: Immutable questionnaire versions with PostgreSQL storage
+- 📂 **File-Based Init**: Load questionnaires from JSON files with smart versioning
 - 🚀 **REST API**: Ready-to-use Express router with OpenAPI specification
 - 📝 **TypeScript**: Full type safety and IntelliSense support
-- 🧪 **Well Tested**: 260+ tests with 86% coverage
+- 🧪 **Well Tested**: 286 tests with 86% coverage
 
 ## Installation
 
@@ -183,6 +184,108 @@ const results = await submissionRepo.listByQuestionnaire('employee-onboarding', 
 
 console.log(results.items); // Array of submissions
 console.log(results.total); // Total count
+```
+
+### Initialize from Files
+
+Load and register questionnaires from JSON files during application startup:
+
+```typescript
+import { initializeQuestionnaires } from 'qbuilder';
+
+// Option 1: Load from specific files
+const result = await initializeQuestionnaires(questionnaireRepo, {
+  files: [
+    './questionnaires/onboarding.json',
+    './questionnaires/survey.json',
+  ],
+});
+
+// Option 2: Load all questionnaires from a directory
+const result = await initializeQuestionnaires(questionnaireRepo, {
+  directory: './questionnaires',
+});
+
+// Option 3: Load from inline definitions
+const result = await initializeQuestionnaires(questionnaireRepo, {
+  definitions: [
+    { id: 'onboarding', title: 'Onboarding', questions: [...] },
+  ],
+});
+
+// Option 4: Combine multiple sources
+const result = await initializeQuestionnaires(questionnaireRepo, {
+  files: ['./questionnaires/main.json'],
+  directory: './questionnaires/templates',
+  definitions: [{ id: 'custom', title: 'Custom', questions: [...] }],
+  continueOnError: true,   // Don't fail fast on errors
+  updateExisting: false,   // Skip existing questionnaires (default)
+});
+
+console.log(`Initialized: ${result.initialized}`);
+console.log(`Skipped: ${result.skipped}`);
+console.log(`Errors: ${result.errors.length}`);
+```
+
+**How versioning works during initialization:**
+
+- **New questionnaires**: Created as version 1
+- **Existing questionnaires with `updateExisting: false`** (default): Skipped entirely
+- **Existing questionnaires with `updateExisting: true`**:
+  - If content is **identical** to existing version: Skipped (prevents unnecessary versions)
+  - If content has **changed**: Creates a new version (v2, v3, etc.)
+
+This prevents creating duplicate versions on every app restart while still allowing updates when needed:
+
+```typescript
+// First run: Creates version 1
+await initializeQuestionnaires(repo, {
+  files: ['./onboarding.json'],
+  updateExisting: true,
+});
+// Result: initialized=1, skipped=0
+
+// Second run (no changes): Skips because content is identical
+await initializeQuestionnaires(repo, {
+  files: ['./onboarding.json'],
+  updateExisting: true,
+});
+// Result: initialized=0, skipped=1
+
+// Third run (after editing onboarding.json): Creates version 2
+await initializeQuestionnaires(repo, {
+  files: ['./onboarding.json'],
+  updateExisting: true,
+});
+// Result: initialized=1, skipped=0
+```
+
+**Questionnaire JSON file format:**
+
+```json
+{
+  "id": "employee-onboarding",
+  "title": "Employee Onboarding",
+  "description": "New employee onboarding form",
+  "questions": [
+    {
+      "id": "fullName",
+      "type": "text",
+      "label": "Full Name",
+      "required": true
+    },
+    {
+      "id": "department",
+      "type": "choice",
+      "label": "Department",
+      "required": true,
+      "options": [
+        { "value": "engineering", "label": "Engineering" },
+        { "value": "sales", "label": "Sales" }
+      ]
+    }
+  ]
+}
 ```
 
 ## REST API

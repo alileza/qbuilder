@@ -1,0 +1,5 @@
+{
+  "id": "invalid",
+  "title": "Invalid Questionnaire"
+  // Missing questions field - should fail validation
+}

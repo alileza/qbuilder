@@ -42,3 +42,6 @@ export * from './db/index.js';
 
 // API exports - REST API with Express and OpenAPI
 export * from './api/index.js';
+
+// Init exports - Questionnaire initialization from files
+export * from './init/index.js';

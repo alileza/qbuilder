@@ -1,0 +1,27 @@
+{
+  "id": "customer-satisfaction",
+  "title": "Customer Satisfaction Survey",
+  "description": "Monthly customer satisfaction survey",
+  "questions": [
+    {
+      "id": "rating",
+      "type": "choice",
+      "label": "How satisfied are you?",
+      "required": true,
+      "options": [
+        { "value": "1", "label": "Very Dissatisfied" },
+        { "value": "2", "label": "Dissatisfied" },
+        { "value": "3", "label": "Neutral" },
+        { "value": "4", "label": "Satisfied" },
+        { "value": "5", "label": "Very Satisfied" }
+      ]
+    },
+    {
+      "id": "feedback",
+      "type": "text",
+      "label": "Additional feedback",
+      "multiline": true,
+      "required": false
+    }
+  ]
+}

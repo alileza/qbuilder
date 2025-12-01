@@ -71,6 +71,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+#### Initialization Module
+- **File-Based Initialization**: Load questionnaires from JSON files during startup
+- `initializeQuestionnaires`: Batch load questionnaires from files, directories, or inline definitions
+- `loadQuestionnaireFromFile`: Load a single questionnaire from a JSON file
+- `loadQuestionnairesFromDirectory`: Recursively load all questionnaires from a directory
+- **Smart Versioning**: Only creates new versions when content actually changes
+  - Prevents duplicate versions on app restarts
+  - Compares definitions before creating new versions
+  - Proper handling of version increments using `update()` instead of `create()`
+- Error handling with `continueOnError` option for resilient initialization
+- Skip/update existing questionnaires with `updateExisting` option
+- 26 comprehensive tests for initialization features including versioning behavior
+
 ### Planned Features
 
 - Additional question types (date, number, email, etc.)

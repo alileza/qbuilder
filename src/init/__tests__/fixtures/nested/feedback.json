@@ -1,0 +1,20 @@
+{
+  "id": "feedback",
+  "title": "Product Feedback",
+  "description": "Collect product feedback from users",
+  "questions": [
+    {
+      "id": "product",
+      "type": "text",
+      "label": "Product Name",
+      "required": true
+    },
+    {
+      "id": "comment",
+      "type": "text",
+      "label": "Your feedback",
+      "multiline": true,
+      "required": true
+    }
+  ]
+}

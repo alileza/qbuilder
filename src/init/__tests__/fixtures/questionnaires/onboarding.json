@@ -1,0 +1,24 @@
+{
+  "id": "onboarding",
+  "title": "Employee Onboarding",
+  "description": "New employee onboarding questionnaire",
+  "questions": [
+    {
+      "id": "name",
+      "type": "text",
+      "label": "Full Name",
+      "required": true
+    },
+    {
+      "id": "department",
+      "type": "choice",
+      "label": "Department",
+      "required": true,
+      "options": [
+        { "value": "engineering", "label": "Engineering" },
+        { "value": "sales", "label": "Sales" },
+        { "value": "marketing", "label": "Marketing" }
+      ]
+    }
+  ]
+}
