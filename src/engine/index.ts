@@ -19,7 +19,7 @@ export {
   validateAnswers,
   parseQuestionnaire,
   type ValidationSuccess,
-  type ValidationError,
+  type ValidationFailure,
   type ValidationErrorDetail,
   type ValidationResult,
 } from './validation.js';

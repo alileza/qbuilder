@@ -333,7 +333,7 @@ File: `src/engine/validation.ts`
 
 ### Task 6.1: Define error codes
 File: `src/errors/codes.ts`
-- [ ] Define error code constants:
+- [x] Define error code constants:
   ```ts
   export const ErrorCodes = {
     VALIDATION_ERROR: 'VALIDATION_ERROR',
@@ -346,12 +346,12 @@ File: `src/errors/codes.ts`
 
 ### Task 6.2: Define error classes
 File: `src/errors/index.ts`
-- [ ] Implement `QBuilderError` base class
-- [ ] Implement `ValidationError` class
-- [ ] Implement `NotFoundError` class
-- [ ] Implement `CyclicDependencyError` class
-- [ ] Implement `ConflictError` class
-- [ ] Add `toJSON()` method matching API error format
+- [x] Implement `QBuilderError` base class
+- [x] Implement `ValidationError` class
+- [x] Implement `NotFoundError` class
+- [x] Implement `CyclicDependencyError` class
+- [x] Implement `ConflictError` class
+- [x] Add `toJSON()` method matching API error format
 
 ---
 

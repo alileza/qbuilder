@@ -273,8 +273,14 @@ describe('validateNoCyclicDependencies', () => {
       validateNoCyclicDependencies(questionnaire);
       expect.fail('Should have thrown an error');
     } catch (error) {
-      expect((error as Error).message).toContain('q1');
-      expect((error as Error).message).toContain('q2');
+      expect((error as Error).message).toContain('Cyclic dependency');
+      // Check that error has details with cycle path
+      const errorWithDetails = error as any;
+      if (errorWithDetails.details) {
+        const detailMessage = errorWithDetails.details[0]?.message || '';
+        expect(detailMessage).toContain('q1');
+        expect(detailMessage).toContain('q2');
+      }
     }
   });
 });

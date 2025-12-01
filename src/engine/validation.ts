@@ -12,6 +12,7 @@ import {
   getAnswerSchemaBuilder,
   type AnswerSchemaRegistry,
 } from '../registry/index.js';
+import { ValidationError as ValidationErrorClass } from '../errors/index.js';
 
 /**
  * Validation result for successful validation
@@ -33,7 +34,7 @@ export interface ValidationErrorDetail {
 /**
  * Validation result for failed validation
  */
-export interface ValidationError {
+export interface ValidationFailure {
   success: false;
   errors: ValidationErrorDetail[];
 }
@@ -41,7 +42,7 @@ export interface ValidationError {
 /**
  * Validation result type
  */
-export type ValidationResult = ValidationSuccess | ValidationError;
+export type ValidationResult = ValidationSuccess | ValidationFailure;
 
 /**
  * Build a dynamic answer validation schema based on visible questions
@@ -132,7 +133,7 @@ export function parseQuestionnaire(payload: unknown): QuestionnaireDefinition {
 
   if (!result.success) {
     const firstError = result.error.issues[0];
-    throw new Error(
+    throw new ValidationErrorClass(
       `Invalid questionnaire definition: ${firstError.message} at ${firstError.path.join('.')}`
     );
   }

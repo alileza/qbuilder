@@ -9,6 +9,8 @@ export * from './engine/index.js';
 // Registry exports
 export * from './registry/index.js';
 
+// Error exports
+export * from './errors/index.js';
+
 // Database exports (will be added in Phase 7)
 // API exports (will be added in Phase 8)
-// Error exports (will be added in Phase 6)

@@ -1,4 +1,5 @@
 import type { QuestionnaireDefinition, QuestionDefinition } from '../schemas/index.js';
+import { CyclicDependencyError } from '../errors/index.js';
 
 /**
  * Build a dependency graph from question visibleIf conditions
@@ -87,9 +88,9 @@ export function validateNoCyclicDependencies(
   const result = detectCycles(graph);
 
   if (result.hasCycle) {
-    const cyclePath = result.path?.join(' -> ') || 'unknown';
-    throw new Error(
-      `Cyclic dependency detected in visibleIf conditions: ${cyclePath}`
+    throw new CyclicDependencyError(
+      'Cyclic dependency detected in visibleIf conditions',
+      result.path
     );
   }
 }
