@@ -12,5 +12,7 @@ export * from './registry/index.js';
 // Error exports
 export * from './errors/index.js';
 
-// Database exports (will be added in Phase 7)
+// Database exports
+export * from './db/index.js';
+
 // API exports (will be added in Phase 8)

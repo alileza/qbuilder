@@ -359,15 +359,15 @@ File: `src/errors/index.ts`
 
 ### Task 7.1: Create migration files
 File: `src/db/migrations/001_create_questionnaires.sql`
-- [ ] Copy migration from PRD Section 5.2
+- [x] Copy migration from PRD Section 5.2
 
 File: `src/db/migrations/002_create_submissions.sql`
-- [ ] Copy migration from PRD Section 5.2
+- [x] Copy migration from PRD Section 5.2
 
 ### Task 7.2: Implement questionnaire repository
 File: `src/db/questionnaire-repository.ts`
-- [ ] Define `QuestionnaireRepository` interface
-- [ ] Implement `createQuestionnaireRepository(pool)`:
+- [x] Define `QuestionnaireRepository` interface
+- [x] Implement `createQuestionnaireRepository(pool)`:
   - `create(definition)` - Insert with version 1
   - `update(id, definition)` - Insert new version
   - `findById(id)` - Get latest version
@@ -377,16 +377,16 @@ File: `src/db/questionnaire-repository.ts`
 
 ### Task 7.3: Implement submission repository
 File: `src/db/submission-repository.ts`
-- [ ] Define `SubmissionRepository` interface
-- [ ] Implement `createSubmissionRepository(pool)`:
+- [x] Define `SubmissionRepository` interface
+- [x] Implement `createSubmissionRepository(pool)`:
   - `create(questionnaireId, version, answers)` - Insert submission
   - `findById(submissionId)` - Get submission
   - `listByQuestionnaire(questionnaireId, options)` - Paginated list
 
 ### Task 7.4: Export database layer
 File: `src/db/index.ts`
-- [ ] Re-export repositories
-- [ ] Export migration file paths for consumers
+- [x] Re-export repositories
+- [x] Export migration file paths for consumers
 
 ---
 
