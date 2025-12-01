@@ -436,13 +436,25 @@ File: `src/api/index.ts`
 - [x] Re-export handlers for custom integrations
 - [x] Re-export error handler
 
+### Task 8.6: OpenAPI Specification
+File: `src/api/openapi.ts`
+- [x] Create OpenAPI 3.0 specification document
+  - Define all questionnaire endpoints
+  - Define all submission endpoints
+  - Define request/response schemas
+  - Define error response templates
+  - Add examples for error responses
+- [x] Add GET /openapi.json endpoint to router
+- [x] Export openApiSpec from api/index.ts
+- [x] Write comprehensive tests for OpenAPI spec
+
 ---
 
 ## Phase 9: Public Exports
 
 ### Task 9.1: Define public API
 File: `src/index.ts`
-- [ ] Export schemas and types:
+- [x] Export schemas and types:
   ```ts
   export type {
     QuestionnaireDefinition,
@@ -454,7 +466,7 @@ File: `src/index.ts`
     ChoiceQuestion,
   } from './schemas';
   ```
-- [ ] Export core functions:
+- [x] Export core functions:
   ```ts
   export {
     parseQuestionnaire,
@@ -463,25 +475,25 @@ File: `src/index.ts`
     getVisibleSections,
   } from './engine';
   ```
-- [ ] Export registry:
+- [x] Export registry:
   ```ts
   export {
     answerSchemaRegistry,
     registerAnswerBuilder,
   } from './registry';
   ```
-- [ ] Export database layer:
+- [x] Export database layer:
   ```ts
   export {
     createQuestionnaireRepository,
     createSubmissionRepository,
   } from './db';
   ```
-- [ ] Export API layer:
+- [x] Export API layer:
   ```ts
   export { createQuestionnaireRouter } from './api';
   ```
-- [ ] Export errors:
+- [x] Export errors:
   ```ts
   export {
     QBuilderError,

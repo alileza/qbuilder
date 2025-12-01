@@ -17,6 +17,7 @@ import {
   handleListSubmissions,
 } from './handlers/submission.js';
 import { createErrorHandler } from './middleware/error-handler.js';
+import { openApiSpec } from './openapi.js';
 
 /**
  * Router configuration options
@@ -227,6 +228,14 @@ export function createQuestionnaireRouter(options: RouterOptions): Router {
       res.status(result.status).json(result.data);
     })
   );
+
+  /**
+   * GET /openapi.json
+   * Get OpenAPI 3.0 specification
+   */
+  router.get('/openapi.json', (req, res) => {
+    res.status(200).json(openApiSpec);
+  });
 
   // Apply error handler middleware
   router.use(createErrorHandler());

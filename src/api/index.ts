@@ -22,3 +22,6 @@ export {
 
 // Middleware
 export { createErrorHandler } from './middleware/error-handler.js';
+
+// OpenAPI specification
+export { openApiSpec } from './openapi.js';
