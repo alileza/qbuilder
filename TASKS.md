@@ -394,7 +394,7 @@ File: `src/db/index.ts`
 
 ### Task 8.1: Implement questionnaire handlers
 File: `src/api/handlers/questionnaire.ts`
-- [ ] Implement handler functions (framework-agnostic):
+- [x] Implement handler functions (framework-agnostic):
   - `handleCreateQuestionnaire(repo, body)`
   - `handleGetQuestionnaire(repo, id)`
   - `handleGetQuestionnaireVersion(repo, id, version)`
@@ -406,21 +406,21 @@ File: `src/api/handlers/questionnaire.ts`
 
 ### Task 8.2: Implement submission handlers
 File: `src/api/handlers/submission.ts`
-- [ ] Implement handler functions:
+- [x] Implement handler functions:
   - `handleSubmitAnswers(questionnaireRepo, submissionRepo, id, body)`
   - `handleGetSubmission(repo, submissionId)`
   - `handleListSubmissions(repo, questionnaireId, query)`
 
 ### Task 8.3: Implement error handling middleware
 File: `src/api/middleware/error-handler.ts`
-- [ ] Implement `createErrorHandler()`:
+- [x] Implement `createErrorHandler()`:
   - Catch `QBuilderError` instances
   - Format to API error structure
   - Handle unknown errors as `INTERNAL_ERROR`
 
 ### Task 8.4: Create Express router factory
 File: `src/api/router.ts`
-- [ ] Implement `createQuestionnaireRouter(options)`:
+- [x] Implement `createQuestionnaireRouter(options)`:
   ```ts
   interface RouterOptions {
     questionnaireRepository: QuestionnaireRepository;
@@ -432,9 +432,9 @@ File: `src/api/router.ts`
 
 ### Task 8.5: Export API layer
 File: `src/api/index.ts`
-- [ ] Re-export router factory
-- [ ] Re-export handlers for custom integrations
-- [ ] Re-export error handler
+- [x] Re-export router factory
+- [x] Re-export handlers for custom integrations
+- [x] Re-export error handler
 
 ---
 

@@ -15,4 +15,5 @@ export * from './errors/index.js';
 // Database exports
 export * from './db/index.js';
 
-// API exports (will be added in Phase 8)
+// API exports
+export * from './api/index.js';
