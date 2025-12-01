@@ -5,7 +5,11 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "dist"
+    "dist",
+    "src/db/migrations/*.sql",
+    "README.md",
+    "LICENSE",
+    "CHANGELOG.md"
   ],
   "exports": {
     ".": {
@@ -28,10 +32,26 @@
     "form",
     "validation",
     "zod",
-    "branching"
+    "branching",
+    "branching-logic",
+    "conditional-logic",
+    "dynamic-forms",
+    "typescript",
+    "postgres",
+    "express",
+    "rest-api",
+    "openapi"
   ],
-  "author": "Ali Reza Yahya",
+  "author": "Ali Reza Yahya <@alileza>",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/alileza/qbuilder.git"
+  },
+  "bugs": {
+    "url": "https://github.com/alileza/qbuilder/issues"
+  },
+  "homepage": "https://github.com/alileza/qbuilder#readme",
   "engines": {
     "node": ">=18.0.0"
   },
