@@ -231,40 +231,40 @@ File: `src/schemas/index.ts`
 
 ### Task 3.1: Implement cyclic dependency detection
 File: `src/engine/cyclic-detection.ts`
-- [ ] Implement `buildDependencyGraph(questions)`:
+- [x] Implement `buildDependencyGraph(questions)`:
   - Returns `Map<questionId, Set<dependsOnIds>>`
-- [ ] Implement `detectCycles(graph)`:
+- [x] Implement `detectCycles(graph)`:
   - Use DFS with visited/recursion stack
   - Returns `{ hasCycle: boolean, path?: string[] }`
-- [ ] Implement `validateNoCyclicDependencies(questionnaire)`:
+- [x] Implement `validateNoCyclicDependencies(questionnaire)`:
   - Throws `CyclicDependencyError` if cycle found
 
 ### Task 3.2: Implement condition evaluation
 File: `src/engine/visibility.ts`
-- [ ] Implement `evaluateCondition(condition, answers)`:
+- [x] Implement `evaluateCondition(condition, answers)`:
   - Handle each operator type
   - Return `boolean`
-- [ ] Handle edge cases:
+- [x] Handle edge cases:
   - Missing answer for referenced question
   - Type coercion for comparisons
 
 ### Task 3.3: Implement visibility logic
 File: `src/engine/visibility.ts`
-- [ ] Implement `isQuestionVisible(question, answers)`:
+- [x] Implement `isQuestionVisible(question, answers)`:
   - If no `visibleIf`, return `true`
   - Evaluate `all` conditions (AND)
   - Evaluate `any` conditions (OR)
   - Apply logic: `(all.every() || all.empty) && (any.some() || any.empty)`
-- [ ] Implement `getVisibleQuestions(questionnaire, answers)`:
+- [x] Implement `getVisibleQuestions(questionnaire, answers)`:
   - Filter questions by visibility
   - Return ordered array
-- [ ] Implement `getVisibleSections(questionnaire, answers)`:
+- [x] Implement `getVisibleSections(questionnaire, answers)`:
   - Return sections with at least one visible question
   - Include filtered `questionIds` for each section
 
 ### Task 3.4: Export engine functions
 File: `src/engine/index.ts`
-- [ ] Re-export all engine functions
+- [x] Re-export all engine functions
 
 ---
 

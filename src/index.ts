@@ -3,7 +3,9 @@
 // Export all schemas and types
 export * from './schemas/index.js';
 
-// Engine exports (will be added in Phase 3)
+// Engine exports
+export * from './engine/index.js';
+
 // Registry exports (will be added in Phase 4)
 // Database exports (will be added in Phase 7)
 // API exports (will be added in Phase 8)
