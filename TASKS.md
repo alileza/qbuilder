@@ -510,53 +510,59 @@ File: `src/index.ts`
 
 ### Task 10.1: Schema tests
 File: `src/schemas/__tests__/questionnaire.test.ts`
-- [ ] Test valid questionnaire parsing
-- [ ] Test invalid questionnaire rejection
-- [ ] Test duplicate ID detection
-- [ ] Test section-question reference validation
+- [x] Test valid questionnaire parsing (14 tests)
+- [x] Test invalid questionnaire rejection
+- [x] Test duplicate ID detection
+- [x] Test section-question reference validation
 
 ### Task 10.2: Visibility tests
 File: `src/engine/__tests__/visibility.test.ts`
-- [ ] Test each condition operator
-- [ ] Test `all` conditions (AND logic)
-- [ ] Test `any` conditions (OR logic)
-- [ ] Test combined `all` + `any`
-- [ ] Test missing answer handling
+- [x] Test each condition operator (36 tests)
+- [x] Test `all` conditions (AND logic)
+- [x] Test `any` conditions (OR logic)
+- [x] Test combined `all` + `any`
+- [x] Test missing answer handling
 
 ### Task 10.3: Cyclic dependency tests
 File: `src/engine/__tests__/cyclic-detection.test.ts`
-- [ ] Test direct cycle (A → B → A)
-- [ ] Test transitive cycle (A → B → C → A)
-- [ ] Test no cycle detection
-- [ ] Test complex graph without cycles
+- [x] Test direct cycle (A → B → A) (14 tests)
+- [x] Test transitive cycle (A → B → C → A)
+- [x] Test no cycle detection
+- [x] Test complex graph without cycles
 
 ### Task 10.4: Validation tests
 File: `src/engine/__tests__/validation.test.ts`
-- [ ] Test required field validation
-- [ ] Test type-specific validation
-- [ ] Test choice option membership
-- [ ] Test invisible question answers ignored
-- [ ] Test dynamic schema based on visibility
+- [x] Test required field validation (23 tests)
+- [x] Test type-specific validation
+- [x] Test choice option membership
+- [x] Test invisible question answers ignored
+- [x] Test dynamic schema based on visibility
 
 ### Task 10.5: Registry tests
-File: `src/registry/__tests__/registry.test.ts`
-- [ ] Test text answer builder
-- [ ] Test choice answer builder (single/multiple)
-- [ ] Test custom type registration
+File: `src/registry/__tests__/registry.test.ts` and `answer-builders.test.ts`
+- [x] Test text answer builder (43 tests total)
+- [x] Test choice answer builder (single/multiple)
+- [x] Test custom type registration
 
 ### Task 10.6: Repository tests (integration)
-File: `src/db/__tests__/repositories.test.ts`
-- [ ] Test questionnaire CRUD with versioning
-- [ ] Test submission CRUD
-- [ ] Test pagination
-- [ ] Requires test database setup
+File: `src/db/__tests__/questionnaire-repository.test.ts` and `submission-repository.test.ts`
+- [x] Test questionnaire CRUD with versioning (27 tests)
+- [x] Test submission CRUD
+- [x] Test pagination
+- [x] Uses mocked database (no setup required)
 
 ### Task 10.7: API tests (integration)
-File: `src/api/__tests__/router.test.ts`
-- [ ] Test all endpoints
-- [ ] Test error responses
-- [ ] Test validation errors
-- [ ] Requires test database setup
+File: `src/api/handlers/__tests__/*.test.ts`, `middleware/__tests__/*.test.ts`, `openapi.test.ts`
+- [x] Test all endpoints (86 tests total)
+- [x] Test error responses
+- [x] Test validation errors
+- [x] Test OpenAPI specification
+- [x] Uses mocked repositories (no database required)
+
+### Task 10.8: Public API tests
+File: `src/__tests__/public-api.test.ts`
+- [x] Test all public exports (17 tests)
+- [x] Test integration workflow
 
 ---
 
