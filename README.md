@@ -20,9 +20,23 @@ A modular, type-safe questionnaire engine for Node.js with branching logic, vali
 
 ## Installation
 
+### From npm (when published)
+
 ```bash
 npm install qbuilder
 ```
+
+### From GitHub Packages
+
+```bash
+# Configure npm to use GitHub Packages
+npm config set @alileza:registry https://npm.pkg.github.com
+
+# Install from GitHub Packages
+npm install @alileza/qbuilder
+```
+
+See [Installing from GitHub Packages](.github/INSTALLING_FROM_GITHUB_PACKAGES.md) for detailed instructions.
 
 ### Peer Dependencies
 

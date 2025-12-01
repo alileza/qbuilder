@@ -1,0 +1,65 @@
+{
+  "id": "employee-onboarding",
+  "title": "Employee Onboarding",
+  "description": "New employee onboarding questionnaire",
+  "questions": [
+    {
+      "id": "fullName",
+      "type": "text",
+      "label": "Full Name",
+      "required": true
+    },
+    {
+      "id": "email",
+      "type": "text",
+      "label": "Email Address",
+      "required": true
+    },
+    {
+      "id": "hasExperience",
+      "type": "choice",
+      "label": "Do you have previous work experience?",
+      "required": true,
+      "options": [
+        { "value": "yes", "label": "Yes" },
+        { "value": "no", "label": "No" }
+      ]
+    },
+    {
+      "id": "yearsOfExperience",
+      "type": "text",
+      "label": "How many years of experience do you have?",
+      "required": true,
+      "visibleIf": {
+        "all": [
+          { "questionId": "hasExperience", "operator": "equals", "value": "yes" }
+        ]
+      }
+    },
+    {
+      "id": "department",
+      "type": "choice",
+      "label": "Which department will you be joining?",
+      "required": true,
+      "options": [
+        { "value": "engineering", "label": "Engineering" },
+        { "value": "sales", "label": "Sales" },
+        { "value": "marketing", "label": "Marketing" },
+        { "value": "hr", "label": "Human Resources" }
+      ]
+    },
+    {
+      "id": "startDate",
+      "type": "text",
+      "label": "When would you like to start?",
+      "required": true
+    },
+    {
+      "id": "additionalInfo",
+      "type": "text",
+      "label": "Any additional information you'd like to share?",
+      "multiline": true,
+      "required": false
+    }
+  ]
+}

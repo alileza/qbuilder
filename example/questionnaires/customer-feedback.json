@@ -1,0 +1,58 @@
+{
+  "id": "customer-feedback",
+  "title": "Customer Feedback Survey",
+  "description": "Help us improve by sharing your feedback",
+  "questions": [
+    {
+      "id": "customerName",
+      "type": "text",
+      "label": "Your Name",
+      "required": true
+    },
+    {
+      "id": "satisfactionRating",
+      "type": "choice",
+      "label": "How satisfied are you with our service?",
+      "required": true,
+      "options": [
+        { "value": "5", "label": "Very Satisfied" },
+        { "value": "4", "label": "Satisfied" },
+        { "value": "3", "label": "Neutral" },
+        { "value": "2", "label": "Dissatisfied" },
+        { "value": "1", "label": "Very Dissatisfied" }
+      ]
+    },
+    {
+      "id": "improvementSuggestions",
+      "type": "text",
+      "label": "What could we improve?",
+      "multiline": true,
+      "required": true,
+      "visibleIf": {
+        "any": [
+          { "questionId": "satisfactionRating", "operator": "equals", "value": "1" },
+          { "questionId": "satisfactionRating", "operator": "equals", "value": "2" },
+          { "questionId": "satisfactionRating", "operator": "equals", "value": "3" }
+        ]
+      }
+    },
+    {
+      "id": "wouldRecommend",
+      "type": "choice",
+      "label": "Would you recommend us to others?",
+      "required": true,
+      "options": [
+        { "value": "yes", "label": "Yes, definitely" },
+        { "value": "maybe", "label": "Maybe" },
+        { "value": "no", "label": "No" }
+      ]
+    },
+    {
+      "id": "additionalComments",
+      "type": "text",
+      "label": "Additional Comments",
+      "multiline": true,
+      "required": false
+    }
+  ]
+}
