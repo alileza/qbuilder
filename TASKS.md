@@ -272,33 +272,33 @@ File: `src/engine/index.ts`
 
 ### Task 4.1: Define registry types
 File: `src/registry/index.ts`
-- [ ] Define `AnswerSchemaBuilder` type:
+- [x] Define `AnswerSchemaBuilder` type:
   ```ts
   type AnswerSchemaBuilder<T extends QuestionDefinition> = (question: T) => ZodTypeAny;
   ```
-- [ ] Define `AnswerSchemaRegistry` type
+- [x] Define `AnswerSchemaRegistry` type
 
 ### Task 4.2: Implement answer builders
 File: `src/registry/answer-builders.ts`
-- [ ] Implement `buildTextAnswerSchema(question)`:
+- [x] Implement `buildTextAnswerSchema(question)`:
   - Required: `z.string().min(1)`
   - Optional: `z.string().optional()`
   - Apply `maxLength` if defined
-- [ ] Implement `buildChoiceAnswerSchema(question)`:
+- [x] Implement `buildChoiceAnswerSchema(question)`:
   - Single: `z.enum([...optionValues])`
   - Multiple: `z.array(z.enum([...optionValues]))`
   - Handle required/optional
 
 ### Task 4.3: Create registry instance
 File: `src/registry/index.ts`
-- [ ] Create default registry:
+- [x] Create default registry:
   ```ts
   const answerSchemaRegistry = {
     text: buildTextAnswerSchema,
     choice: buildChoiceAnswerSchema,
   };
   ```
-- [ ] Export `registerAnswerBuilder(type, builder)` for extensibility
+- [x] Export `registerAnswerBuilder(type, builder)` for extensibility
 
 ---
 
