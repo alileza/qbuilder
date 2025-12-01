@@ -14,7 +14,7 @@ A complete end-to-end example of using the `qbuilder` package to build a questio
 
 ## Prerequisites
 
-- Node.js >= 18.0.0
+- Node.js >= 20.0.0
 - Docker and Docker Compose
 - npm or yarn
 

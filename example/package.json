@@ -19,6 +19,9 @@
   ],
   "author": "Ali Reza Yahya",
   "license": "MIT",
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "dependencies": {
     "qbuilder": "file:..",
     "express": "^5.1.0",

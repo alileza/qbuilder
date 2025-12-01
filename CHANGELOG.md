@@ -64,7 +64,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Package name: `qbuilder`
 - Version: 0.1.0
 - License: MIT
-- Node: >=18.0.0
+- Node: >=20.0.0
 - TypeScript: ^5.9.3
 
 ---
