@@ -2,8 +2,8 @@
 
 A modular, type-safe questionnaire engine for Node.js with branching logic, validation, and versioning support.
 
-[![Tests](https://img.shields.io/badge/tests-286%20passing-brightgreen)](https://github.com/alileza/qbuilder)
-[![Coverage](https://img.shields.io/badge/coverage-86%25-green)](https://github.com/alileza/qbuilder)
+[![Tests](https://img.shields.io/badge/tests-298%20passing-brightgreen)](https://github.com/alileza/qbuilder)
+[![Coverage](https://img.shields.io/badge/coverage-88%25-green)](https://github.com/alileza/qbuilder)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 
@@ -14,9 +14,12 @@ A modular, type-safe questionnaire engine for Node.js with branching logic, vali
 - 📦 **Extensible**: Easy to add custom question types and validation rules
 - 🗄️ **Versioning**: Immutable questionnaire versions with PostgreSQL storage
 - 📂 **File-Based Init**: Load questionnaires from JSON files with smart versioning
+- 🔄 **Auto Migrations**: Run database migrations automatically on startup
+- 🏷️ **Table Prefix**: Configurable table prefix (default: `qbuilder_`) to avoid naming conflicts
+- 📋 **Metadata Support**: Store arbitrary metadata with questionnaires and submissions
 - 🚀 **REST API**: Ready-to-use Express router with OpenAPI specification
 - 📝 **TypeScript**: Full type safety and IntelliSense support
-- 🧪 **Well Tested**: 286 tests with 86% coverage
+- 🧪 **Well Tested**: 298 tests with 88% coverage
 
 ## Installation
 
@@ -131,7 +134,11 @@ console.log(visibleQuestions.map(q => q.id)); // ['fullName', 'hasJob']
 
 ```typescript
 import { Pool } from 'pg';
-import { createQuestionnaireRepository, createSubmissionRepository } from 'qbuilder';
+import {
+  createQuestionnaireRepository,
+  createSubmissionRepository,
+  runMigrations,
+} from 'qbuilder';
 
 const pool = new Pool({
   host: 'localhost',
@@ -140,25 +147,49 @@ const pool = new Pool({
   password: 'password',
 });
 
-// Create repositories
+// Create repositories (uses default 'qbuilder_' table prefix)
 const questionnaireRepo = createQuestionnaireRepository(pool);
 const submissionRepo = createSubmissionRepository(pool);
+
+// Or with custom table prefix
+const questionnaireRepo = createQuestionnaireRepository(pool, { tablePrefix: 'myapp_' });
+const submissionRepo = createSubmissionRepository(pool, { tablePrefix: 'myapp_' });
 ```
 
 ### Run Migrations
 
-QBuilder provides SQL migrations in `src/db/migrations/`:
+QBuilder provides automatic migrations. Tables are prefixed with `qbuilder_` by default:
+- `qbuilder_questionnaires`
+- `qbuilder_questionnaire_versions`
+- `qbuilder_submissions`
+- `qbuilder_migrations`
 
-```bash
-# Copy migrations to your project
-cp node_modules/qbuilder/dist/db/migrations/*.sql ./migrations/
+**Option 1: Run migrations separately**
+
+```typescript
+import { runMigrations } from 'qbuilder';
+
+// Run with default prefix
+await runMigrations(pool);
+
+// Or with custom prefix
+await runMigrations(pool, { tablePrefix: 'myapp_' });
 ```
 
-Or run them directly:
+**Option 2: Run migrations with initialization (recommended)**
 
-```sql
--- 001_create_questionnaires.sql
--- 002_create_submissions.sql
+```typescript
+import { initializeQuestionnaires } from 'qbuilder';
+
+// Combined: run migrations + load questionnaires
+const result = await initializeQuestionnaires(questionnaireRepo, {
+  pool,
+  runMigrations: true,
+  directory: './questionnaires',
+});
+
+console.log('Migrations:', result.migrations);
+// { executed: ['001_create_questionnaires', ...], skipped: [] }
 ```
 
 ### Store Questionnaires
@@ -168,6 +199,11 @@ Or run them directly:
 const created = await questionnaireRepo.create(questionnaire);
 console.log(created.version); // 1
 
+// Create with metadata
+const created = await questionnaireRepo.create(questionnaire, {
+  metadata: { category: 'onboarding', createdBy: 'admin' }
+});
+
 // Update creates a new version
 const updated = await questionnaireRepo.update('employee-onboarding', updatedDefinition);
 console.log(updated.version); // 2
@@ -175,8 +211,9 @@ console.log(updated.version); // 2
 // Retrieve specific version
 const v1 = await questionnaireRepo.findByIdAndVersion('employee-onboarding', 1);
 
-// Get latest version
+// Get latest version (includes metadata)
 const latest = await questionnaireRepo.findById('employee-onboarding');
+console.log(latest.metadata); // { category: 'onboarding', ... }
 ```
 
 ### Store Submissions
@@ -189,6 +226,14 @@ const submission = await submissionRepo.create(
   answers
 );
 
+// Submit with metadata
+const submission = await submissionRepo.create(
+  'employee-onboarding',
+  1,
+  answers,
+  { metadata: { source: 'mobile-app', sessionId: 'abc123' } }
+);
+
 // List submissions with pagination
 const results = await submissionRepo.listByQuestionnaire('employee-onboarding', {
   version: 1, // optional filter
@@ -196,7 +241,7 @@ const results = await submissionRepo.listByQuestionnaire('employee-onboarding', 
   offset: 0,
 });
 
-console.log(results.items); // Array of submissions
+console.log(results.items); // Array of submissions (includes metadata)
 console.log(results.total); // Total count
 ```
 
@@ -207,7 +252,20 @@ Load and register questionnaires from JSON files during application startup:
 ```typescript
 import { initializeQuestionnaires } from 'qbuilder';
 
-// Option 1: Load from specific files
+// Recommended: Combined migrations + file loading
+const result = await initializeQuestionnaires(questionnaireRepo, {
+  pool,                    // Required for migrations
+  runMigrations: true,     // Run DB migrations automatically
+  tablePrefix: 'qbuilder_', // Optional, this is the default
+  directory: './questionnaires',
+  updateExisting: true,    // Update if content changed
+});
+
+console.log('Migrations:', result.migrations?.executed);
+console.log(`Initialized: ${result.initialized}`);
+console.log(`Skipped: ${result.skipped}`);
+
+// Option 1: Load from specific files (without migrations)
 const result = await initializeQuestionnaires(questionnaireRepo, {
   files: [
     './questionnaires/onboarding.json',
@@ -229,11 +287,13 @@ const result = await initializeQuestionnaires(questionnaireRepo, {
 
 // Option 4: Combine multiple sources
 const result = await initializeQuestionnaires(questionnaireRepo, {
+  pool,
+  runMigrations: true,
   files: ['./questionnaires/main.json'],
   directory: './questionnaires/templates',
   definitions: [{ id: 'custom', title: 'Custom', questions: [...] }],
   continueOnError: true,   // Don't fail fast on errors
-  updateExisting: false,   // Skip existing questionnaires (default)
+  updateExisting: true,    // Update if content changed
 });
 
 console.log(`Initialized: ${result.initialized}`);
@@ -505,6 +565,7 @@ QBuilder is written in TypeScript and provides full type safety:
 
 ```typescript
 import type {
+  // Questionnaire types
   QuestionnaireDefinition,
   QuestionDefinition,
   TextQuestion,
@@ -512,6 +573,22 @@ import type {
   Condition,
   VisibleIf,
   ValidationResult,
+
+  // Database types
+  QuestionnaireRepository,
+  SubmissionRepository,
+  QuestionnaireWithVersion,
+  Submission,
+  Metadata,
+  RepositoryOptions,
+
+  // Migration types
+  MigrationResult,
+  MigrationOptions,
+
+  // Init types
+  InitializeOptions,
+  InitializeResult,
 } from 'qbuilder';
 
 // All types are exported and fully documented
@@ -521,6 +598,13 @@ const question: TextQuestion = {
   label: 'Your Name',
   required: true,
   maxLength: 100,
+};
+
+// Metadata is a simple object type
+const metadata: Metadata = {
+  category: 'onboarding',
+  priority: 1,
+  tags: ['new-hire', 'required'],
 };
 ```
 
@@ -546,25 +630,52 @@ Returns sections with their visible questions.
 
 ### Database Functions
 
-#### `createQuestionnaireRepository(pool: Pool): QuestionnaireRepository`
+#### `runMigrations(pool: Pool, options?): Promise<MigrationResult>`
+
+Runs database migrations. Idempotent - only runs migrations that haven't been applied.
+
+**Options:**
+```typescript
+{
+  tablePrefix?: string;  // default: 'qbuilder_'
+}
+```
+
+**Returns:** `{ executed: string[], skipped: string[] }`
+
+#### `createQuestionnaireRepository(pool: Pool, options?): QuestionnaireRepository`
 
 Creates a repository for managing questionnaires.
 
+**Options:**
+```typescript
+{
+  tablePrefix?: string;  // default: 'qbuilder_'
+}
+```
+
 **Methods:**
-- `create(definition)` - Create version 1
-- `update(id, definition)` - Create new version
-- `findById(id)` - Get latest version
+- `create(definition, options?)` - Create version 1 (options: `{ metadata?: object }`)
+- `update(id, definition, options?)` - Create new version (options: `{ metadata?: object }`)
+- `findById(id)` - Get latest version (includes metadata)
 - `findByIdAndVersion(id, version)` - Get specific version
 - `listVersions(id)` - Get version metadata
 - `list()` - List all questionnaires
 
-#### `createSubmissionRepository(pool: Pool): SubmissionRepository`
+#### `createSubmissionRepository(pool: Pool, options?): SubmissionRepository`
 
 Creates a repository for managing submissions.
 
+**Options:**
+```typescript
+{
+  tablePrefix?: string;  // default: 'qbuilder_'
+}
+```
+
 **Methods:**
-- `create(questionnaireId, version, answers)` - Store submission
-- `findById(submissionId)` - Get submission
+- `create(questionnaireId, version, answers, options?)` - Store submission (options: `{ metadata?: object }`)
+- `findById(submissionId)` - Get submission (includes metadata)
 - `listByQuestionnaire(id, options)` - List with pagination
 
 ### API Functions
