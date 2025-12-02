@@ -1,7 +1,8 @@
 import type { Pool } from 'pg';
 import type { AnswerPayload } from '../schemas/index.js';
 import { NotFoundError } from '../errors/index.js';
-import type { Metadata } from './questionnaire-repository.js';
+import type { Metadata, RepositoryOptions } from './questionnaire-repository.js';
+import { DEFAULT_TABLE_PREFIX } from './migrations.js';
 
 /**
  * Submission data
@@ -60,19 +61,28 @@ export interface SubmissionRepository {
 
 /**
  * Create a submission repository
+ *
+ * @param pool - PostgreSQL connection pool
+ * @param options - Repository options including table prefix
  */
-export function createSubmissionRepository(pool: Pool): SubmissionRepository {
+export function createSubmissionRepository(
+  pool: Pool,
+  options: RepositoryOptions = {}
+): SubmissionRepository {
+  const prefix = options.tablePrefix ?? DEFAULT_TABLE_PREFIX;
+  const submissionsTable = `${prefix}submissions`;
+
   return {
     async create(
       questionnaireId: string,
       version: number,
       answers: AnswerPayload,
-      options: CreateSubmissionOptions = {}
+      opts: CreateSubmissionOptions = {}
     ): Promise<Submission> {
-      const metadata = options.metadata || {};
+      const metadata = opts.metadata || {};
       try {
         const result = await pool.query(
-          `INSERT INTO submissions
+          `INSERT INTO ${submissionsTable}
            (questionnaire_id, questionnaire_version, answers, metadata, created_at)
            VALUES ($1, $2, $3, $4, NOW())
            RETURNING id, questionnaire_id, questionnaire_version, answers, metadata, created_at`,
@@ -102,7 +112,7 @@ export function createSubmissionRepository(pool: Pool): SubmissionRepository {
     async findById(submissionId: string): Promise<Submission | null> {
       const result = await pool.query(
         `SELECT id, questionnaire_id, questionnaire_version, answers, metadata, created_at
-         FROM submissions
+         FROM ${submissionsTable}
          WHERE id = $1`,
         [submissionId]
       );
@@ -124,9 +134,9 @@ export function createSubmissionRepository(pool: Pool): SubmissionRepository {
 
     async listByQuestionnaire(
       questionnaireId: string,
-      options: SubmissionListOptions = {}
+      opts: SubmissionListOptions = {}
     ): Promise<SubmissionListResult> {
-      const { version, limit = 50, offset = 0 } = options;
+      const { version, limit = 50, offset = 0 } = opts;
 
       // Build WHERE clause
       const conditions = ['questionnaire_id = $1'];
@@ -142,7 +152,7 @@ export function createSubmissionRepository(pool: Pool): SubmissionRepository {
       // Get total count
       const countResult = await pool.query(
         `SELECT COUNT(*) as total
-         FROM submissions
+         FROM ${submissionsTable}
          WHERE ${whereClause}`,
         params
       );
@@ -152,7 +162,7 @@ export function createSubmissionRepository(pool: Pool): SubmissionRepository {
       // Get submissions
       const result = await pool.query(
         `SELECT id, questionnaire_id, questionnaire_version, answers, metadata, created_at
-         FROM submissions
+         FROM ${submissionsTable}
          WHERE ${whereClause}
          ORDER BY created_at DESC
          LIMIT $${params.length + 1} OFFSET $${params.length + 2}`,

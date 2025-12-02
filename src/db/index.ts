@@ -7,6 +7,7 @@ export {
   type Metadata,
   type CreateQuestionnaireOptions,
   type UpdateQuestionnaireOptions,
+  type RepositoryOptions,
 } from './questionnaire-repository.js';
 
 export {
@@ -21,6 +22,8 @@ export {
 export {
   runMigrations,
   migrations,
+  DEFAULT_TABLE_PREFIX,
   type Migration,
   type MigrationResult,
+  type MigrationOptions,
 } from './migrations.js';

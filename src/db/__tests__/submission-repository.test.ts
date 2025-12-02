@@ -48,7 +48,7 @@ describe('SubmissionRepository', () => {
       });
 
       expect(mockPool.query).toHaveBeenCalledWith(
-        expect.stringContaining('INSERT INTO submissions'),
+        expect.stringContaining('INSERT INTO qbuilder_submissions'),
         ['onboarding', 1, JSON.stringify(sampleAnswers), '{}']
       );
     });

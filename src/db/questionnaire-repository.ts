@@ -1,11 +1,22 @@
 import type { Pool } from 'pg';
 import type { QuestionnaireDefinition } from '../schemas/index.js';
 import { NotFoundError, ConflictError } from '../errors/index.js';
+import { DEFAULT_TABLE_PREFIX } from './migrations.js';
 
 /**
  * Metadata type (arbitrary JSON object)
  */
 export type Metadata = Record<string, unknown>;
+
+/**
+ * Options for creating a repository
+ */
+export interface RepositoryOptions {
+  /**
+   * Table name prefix (default: 'qbuilder_')
+   */
+  tablePrefix?: string;
+}
 
 /**
  * Questionnaire with version metadata
@@ -62,24 +73,34 @@ export interface QuestionnaireRepository {
 
 /**
  * Create a questionnaire repository
+ *
+ * @param pool - PostgreSQL connection pool
+ * @param options - Repository options including table prefix
  */
-export function createQuestionnaireRepository(pool: Pool): QuestionnaireRepository {
+export function createQuestionnaireRepository(
+  pool: Pool,
+  options: RepositoryOptions = {}
+): QuestionnaireRepository {
+  const prefix = options.tablePrefix ?? DEFAULT_TABLE_PREFIX;
+  const questionnairesTable = `${prefix}questionnaires`;
+  const versionsTable = `${prefix}questionnaire_versions`;
+
   return {
-    async create(definition: QuestionnaireDefinition, options: CreateQuestionnaireOptions = {}): Promise<QuestionnaireWithVersion> {
+    async create(definition: QuestionnaireDefinition, opts: CreateQuestionnaireOptions = {}): Promise<QuestionnaireWithVersion> {
       const client = await pool.connect();
-      const metadata = options.metadata || {};
+      const metadata = opts.metadata || {};
       try {
         await client.query('BEGIN');
 
         // Insert into questionnaires table
         await client.query(
-          'INSERT INTO questionnaires (id, created_at, updated_at) VALUES ($1, NOW(), NOW())',
+          `INSERT INTO ${questionnairesTable} (id, created_at, updated_at) VALUES ($1, NOW(), NOW())`,
           [definition.id]
         );
 
         // Insert version 1
         const result = await client.query(
-          `INSERT INTO questionnaire_versions
+          `INSERT INTO ${versionsTable}
            (questionnaire_id, version, title, description, definition, metadata, created_at)
            VALUES ($1, 1, $2, $3, $4, $5, NOW())
            RETURNING version, created_at, metadata`,
@@ -117,7 +138,7 @@ export function createQuestionnaireRepository(pool: Pool): QuestionnaireReposito
     async findById(id: string): Promise<QuestionnaireWithVersion | null> {
       const result = await pool.query(
         `SELECT definition, version, created_at, metadata
-         FROM questionnaire_versions
+         FROM ${versionsTable}
          WHERE questionnaire_id = $1
          ORDER BY version DESC
          LIMIT 1`,
@@ -140,7 +161,7 @@ export function createQuestionnaireRepository(pool: Pool): QuestionnaireReposito
     async findByIdAndVersion(id: string, version: number): Promise<QuestionnaireWithVersion | null> {
       const result = await pool.query(
         `SELECT definition, version, created_at, metadata
-         FROM questionnaire_versions
+         FROM ${versionsTable}
          WHERE questionnaire_id = $1 AND version = $2`,
         [id, version]
       );
@@ -158,15 +179,15 @@ export function createQuestionnaireRepository(pool: Pool): QuestionnaireReposito
       };
     },
 
-    async update(id: string, definition: QuestionnaireDefinition, options: UpdateQuestionnaireOptions = {}): Promise<QuestionnaireWithVersion> {
+    async update(id: string, definition: QuestionnaireDefinition, opts: UpdateQuestionnaireOptions = {}): Promise<QuestionnaireWithVersion> {
       const client = await pool.connect();
-      const metadata = options.metadata || {};
+      const metadata = opts.metadata || {};
       try {
         await client.query('BEGIN');
 
         // Check if questionnaire exists
         const existsResult = await client.query(
-          'SELECT id FROM questionnaires WHERE id = $1',
+          `SELECT id FROM ${questionnairesTable} WHERE id = $1`,
           [id]
         );
 
@@ -176,7 +197,7 @@ export function createQuestionnaireRepository(pool: Pool): QuestionnaireReposito
 
         // Get current max version
         const versionResult = await client.query(
-          'SELECT MAX(version) as max_version FROM questionnaire_versions WHERE questionnaire_id = $1',
+          `SELECT MAX(version) as max_version FROM ${versionsTable} WHERE questionnaire_id = $1`,
           [id]
         );
 
@@ -184,7 +205,7 @@ export function createQuestionnaireRepository(pool: Pool): QuestionnaireReposito
 
         // Insert new version
         const result = await client.query(
-          `INSERT INTO questionnaire_versions
+          `INSERT INTO ${versionsTable}
            (questionnaire_id, version, title, description, definition, metadata, created_at)
            VALUES ($1, $2, $3, $4, $5, $6, NOW())
            RETURNING version, created_at, metadata`,
@@ -200,7 +221,7 @@ export function createQuestionnaireRepository(pool: Pool): QuestionnaireReposito
 
         // Update questionnaire updated_at
         await client.query(
-          'UPDATE questionnaires SET updated_at = NOW() WHERE id = $1',
+          `UPDATE ${questionnairesTable} SET updated_at = NOW() WHERE id = $1`,
           [id]
         );
 
@@ -224,7 +245,7 @@ export function createQuestionnaireRepository(pool: Pool): QuestionnaireReposito
     async listVersions(id: string): Promise<VersionMetadata[]> {
       const result = await pool.query(
         `SELECT version, created_at
-         FROM questionnaire_versions
+         FROM ${versionsTable}
          WHERE questionnaire_id = $1
          ORDER BY version ASC`,
         [id]
@@ -243,8 +264,8 @@ export function createQuestionnaireRepository(pool: Pool): QuestionnaireReposito
            qv.title,
            MAX(qv.version) as latest_version,
            q.created_at
-         FROM questionnaires q
-         JOIN questionnaire_versions qv ON q.id = qv.questionnaire_id
+         FROM ${questionnairesTable} q
+         JOIN ${versionsTable} qv ON q.id = qv.questionnaire_id
          GROUP BY q.id, qv.title, q.created_at
          ORDER BY q.created_at DESC`
       );

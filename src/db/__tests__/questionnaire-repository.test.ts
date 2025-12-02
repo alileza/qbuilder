@@ -56,7 +56,7 @@ describe('QuestionnaireRepository', () => {
 
       expect(mockClient.query).toHaveBeenCalledWith('BEGIN');
       expect(mockClient.query).toHaveBeenCalledWith(
-        'INSERT INTO questionnaires (id, created_at, updated_at) VALUES ($1, NOW(), NOW())',
+        'INSERT INTO qbuilder_questionnaires (id, created_at, updated_at) VALUES ($1, NOW(), NOW())',
         ['onboarding']
       );
       expect(mockClient.query).toHaveBeenCalledWith('COMMIT');

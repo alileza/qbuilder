@@ -13,7 +13,7 @@ import type { Pool } from 'pg';
 import { parseQuestionnaire } from '../engine/index.js';
 import type { QuestionnaireRepository, QuestionnaireWithVersion } from '../db/questionnaire-repository.js';
 import type { QuestionnaireDefinition } from '../schemas/questionnaire.js';
-import { runMigrations, type MigrationResult } from '../db/migrations.js';
+import { runMigrations, DEFAULT_TABLE_PREFIX, type MigrationResult } from '../db/migrations.js';
 
 /**
  * Options for initializing questionnaires
@@ -24,6 +24,12 @@ export interface InitializeOptions {
    * Required if runMigrations is true
    */
   pool?: Pool;
+
+  /**
+   * Table name prefix (default: 'qbuilder_')
+   * Tables will be named: {prefix}questionnaires, {prefix}submissions, etc.
+   */
+  tablePrefix?: string;
 
   /**
    * If true, run database migrations before initializing questionnaires
@@ -232,7 +238,9 @@ export async function initializeQuestionnaires(
     if (!options.pool) {
       throw new Error('pool is required when runMigrations is true');
     }
-    result.migrations = await runMigrations(options.pool);
+    result.migrations = await runMigrations(options.pool, {
+      tablePrefix: options.tablePrefix,
+    });
   }
 
   const definitions: QuestionnaireDefinition[] = [];
