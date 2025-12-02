@@ -29,6 +29,7 @@ describe('SubmissionRepository', () => {
             questionnaire_id: 'onboarding',
             questionnaire_version: 1,
             answers: sampleAnswers,
+            metadata: {},
             created_at: now,
           },
         ],
@@ -42,12 +43,13 @@ describe('SubmissionRepository', () => {
         questionnaireId: 'onboarding',
         questionnaireVersion: 1,
         answers: sampleAnswers,
+        metadata: {},
         createdAt: now,
       });
 
       expect(mockPool.query).toHaveBeenCalledWith(
         expect.stringContaining('INSERT INTO submissions'),
-        ['onboarding', 1, JSON.stringify(sampleAnswers)]
+        ['onboarding', 1, JSON.stringify(sampleAnswers), '{}']
       );
     });
 
@@ -78,7 +80,7 @@ describe('SubmissionRepository', () => {
     it('should handle JSONB serialization of answers', async () => {
       const complexAnswers = {
         preferences: ['option1', 'option2'],
-        metadata: { source: 'web', timestamp: 1234567890 },
+        extraData: { source: 'web', timestamp: 1234567890 },
       };
 
       const now = new Date();
@@ -91,6 +93,7 @@ describe('SubmissionRepository', () => {
             questionnaire_id: 'onboarding',
             questionnaire_version: 1,
             answers: complexAnswers,
+            metadata: {},
             created_at: now,
           },
         ],
@@ -102,7 +105,7 @@ describe('SubmissionRepository', () => {
       expect(result.answers).toEqual(complexAnswers);
       expect(mockPool.query).toHaveBeenCalledWith(
         expect.any(String),
-        ['onboarding', 1, JSON.stringify(complexAnswers)]
+        ['onboarding', 1, JSON.stringify(complexAnswers), '{}']
       );
     });
   });
@@ -119,6 +122,7 @@ describe('SubmissionRepository', () => {
             questionnaire_id: 'onboarding',
             questionnaire_version: 1,
             answers: sampleAnswers,
+            metadata: { source: 'test' },
             created_at: now,
           },
         ],
@@ -132,6 +136,7 @@ describe('SubmissionRepository', () => {
         questionnaireId: 'onboarding',
         questionnaireVersion: 1,
         answers: sampleAnswers,
+        metadata: { source: 'test' },
         createdAt: now,
       });
 
@@ -168,6 +173,7 @@ describe('SubmissionRepository', () => {
               questionnaire_id: 'onboarding',
               questionnaire_version: 1,
               answers: { name: 'John' },
+              metadata: {},
               created_at: date1,
             },
             {
@@ -175,6 +181,7 @@ describe('SubmissionRepository', () => {
               questionnaire_id: 'onboarding',
               questionnaire_version: 1,
               answers: { name: 'Jane' },
+              metadata: {},
               created_at: date2,
             },
             {
@@ -182,6 +189,7 @@ describe('SubmissionRepository', () => {
               questionnaire_id: 'onboarding',
               questionnaire_version: 2,
               answers: { name: 'Bob' },
+              metadata: {},
               created_at: date3,
             },
           ],
@@ -197,6 +205,7 @@ describe('SubmissionRepository', () => {
             questionnaireId: 'onboarding',
             questionnaireVersion: 1,
             answers: { name: 'John' },
+            metadata: {},
             createdAt: date1,
           },
           {
@@ -204,6 +213,7 @@ describe('SubmissionRepository', () => {
             questionnaireId: 'onboarding',
             questionnaireVersion: 1,
             answers: { name: 'Jane' },
+            metadata: {},
             createdAt: date2,
           },
           {
@@ -211,6 +221,7 @@ describe('SubmissionRepository', () => {
             questionnaireId: 'onboarding',
             questionnaireVersion: 2,
             answers: { name: 'Bob' },
+            metadata: {},
             createdAt: date3,
           },
         ],

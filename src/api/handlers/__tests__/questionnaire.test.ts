@@ -53,7 +53,7 @@ describe('Questionnaire Handlers', () => {
   describe('handleCreateQuestionnaire', () => {
     it('should create a questionnaire and return 201', async () => {
       const now = new Date();
-      const created = { ...sampleQuestionnaire, version: 1, createdAt: now };
+      const created = { ...sampleQuestionnaire, version: 1, createdAt: now, metadata: {} };
       mockRepo.create.mockResolvedValue(created);
 
       const result = await handleCreateQuestionnaire(mockRepo as any, sampleQuestionnaire);
@@ -65,7 +65,8 @@ describe('Questionnaire Handlers', () => {
           id: sampleQuestionnaire.id,
           title: sampleQuestionnaire.title,
           description: sampleQuestionnaire.description,
-        })
+        }),
+        { metadata: undefined }
       );
     });
 
@@ -150,7 +151,7 @@ describe('Questionnaire Handlers', () => {
   describe('handleUpdateQuestionnaire', () => {
     it('should update questionnaire and return 200', async () => {
       const now = new Date();
-      const updated = { ...sampleQuestionnaire, version: 2, createdAt: now };
+      const updated = { ...sampleQuestionnaire, version: 2, createdAt: now, metadata: {} };
       mockRepo.update.mockResolvedValue(updated);
 
       const result = await handleUpdateQuestionnaire(
@@ -167,21 +168,23 @@ describe('Questionnaire Handlers', () => {
           id: sampleQuestionnaire.id,
           title: sampleQuestionnaire.title,
           description: sampleQuestionnaire.description,
-        })
+        }),
+        { metadata: undefined }
       );
     });
 
     it('should override ID in body with URL parameter', async () => {
       const now = new Date();
       const bodyWithDifferentId = { ...sampleQuestionnaire, id: 'different' };
-      const updated = { ...sampleQuestionnaire, version: 2, createdAt: now };
+      const updated = { ...sampleQuestionnaire, version: 2, createdAt: now, metadata: {} };
       mockRepo.update.mockResolvedValue(updated);
 
       await handleUpdateQuestionnaire(mockRepo as any, 'onboarding', bodyWithDifferentId);
 
       expect(mockRepo.update).toHaveBeenCalledWith(
         'onboarding',
-        expect.objectContaining({ id: 'onboarding' })
+        expect.objectContaining({ id: 'onboarding' }),
+        { metadata: undefined }
       );
     });
 

@@ -53,13 +53,14 @@ describe('Submission Handlers', () => {
   describe('handleSubmitAnswers', () => {
     it('should submit valid answers and return 201', async () => {
       const now = new Date();
-      const questionnaire = { ...sampleQuestionnaire, version: 1, createdAt: now };
+      const questionnaire = { ...sampleQuestionnaire, version: 1, createdAt: now, metadata: {} };
       const answers = { name: 'John Doe', department: 'eng' };
       const submission = {
         id: '123e4567-e89b-12d3-a456-426614174000',
         questionnaireId: 'onboarding',
         questionnaireVersion: 1,
         answers,
+        metadata: {},
         createdAt: now,
       };
 
@@ -75,18 +76,19 @@ describe('Submission Handlers', () => {
 
       expect(result.status).toBe(201);
       expect(result.data.submission).toEqual(submission);
-      expect(mockSubmissionRepo.create).toHaveBeenCalledWith('onboarding', 1, answers);
+      expect(mockSubmissionRepo.create).toHaveBeenCalledWith('onboarding', 1, answers, { metadata: undefined });
     });
 
     it('should submit to specific version when provided', async () => {
       const now = new Date();
-      const questionnaire = { ...sampleQuestionnaire, version: 2, createdAt: now };
+      const questionnaire = { ...sampleQuestionnaire, version: 2, createdAt: now, metadata: {} };
       const answers = { name: 'John Doe', department: 'eng' };
       const submission = {
         id: '123e4567-e89b-12d3-a456-426614174000',
         questionnaireId: 'onboarding',
         questionnaireVersion: 2,
         answers,
+        metadata: {},
         createdAt: now,
       };
 
@@ -102,7 +104,7 @@ describe('Submission Handlers', () => {
 
       expect(result.status).toBe(201);
       expect(mockQuestionnaireRepo.findByIdAndVersion).toHaveBeenCalledWith('onboarding', 2);
-      expect(mockSubmissionRepo.create).toHaveBeenCalledWith('onboarding', 2, answers);
+      expect(mockSubmissionRepo.create).toHaveBeenCalledWith('onboarding', 2, answers, { metadata: undefined });
     });
 
     it('should throw NotFoundError if questionnaire does not exist', async () => {

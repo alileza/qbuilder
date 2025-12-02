@@ -3,11 +3,17 @@ import type { QuestionnaireDefinition } from '../schemas/index.js';
 import { NotFoundError, ConflictError } from '../errors/index.js';
 
 /**
+ * Metadata type (arbitrary JSON object)
+ */
+export type Metadata = Record<string, unknown>;
+
+/**
  * Questionnaire with version metadata
  */
 export interface QuestionnaireWithVersion extends QuestionnaireDefinition {
   version: number;
   createdAt: Date;
+  metadata: Metadata;
 }
 
 /**
@@ -29,13 +35,27 @@ export interface QuestionnaireListItem {
 }
 
 /**
+ * Options for creating a questionnaire
+ */
+export interface CreateQuestionnaireOptions {
+  metadata?: Metadata;
+}
+
+/**
+ * Options for updating a questionnaire
+ */
+export interface UpdateQuestionnaireOptions {
+  metadata?: Metadata;
+}
+
+/**
  * Questionnaire repository interface
  */
 export interface QuestionnaireRepository {
-  create(definition: QuestionnaireDefinition): Promise<QuestionnaireWithVersion>;
+  create(definition: QuestionnaireDefinition, options?: CreateQuestionnaireOptions): Promise<QuestionnaireWithVersion>;
   findById(id: string): Promise<QuestionnaireWithVersion | null>;
   findByIdAndVersion(id: string, version: number): Promise<QuestionnaireWithVersion | null>;
-  update(id: string, definition: QuestionnaireDefinition): Promise<QuestionnaireWithVersion>;
+  update(id: string, definition: QuestionnaireDefinition, options?: UpdateQuestionnaireOptions): Promise<QuestionnaireWithVersion>;
   listVersions(id: string): Promise<VersionMetadata[]>;
   list(): Promise<QuestionnaireListItem[]>;
 }
@@ -45,8 +65,9 @@ export interface QuestionnaireRepository {
  */
 export function createQuestionnaireRepository(pool: Pool): QuestionnaireRepository {
   return {
-    async create(definition: QuestionnaireDefinition): Promise<QuestionnaireWithVersion> {
+    async create(definition: QuestionnaireDefinition, options: CreateQuestionnaireOptions = {}): Promise<QuestionnaireWithVersion> {
       const client = await pool.connect();
+      const metadata = options.metadata || {};
       try {
         await client.query('BEGIN');
 
@@ -59,14 +80,15 @@ export function createQuestionnaireRepository(pool: Pool): QuestionnaireReposito
         // Insert version 1
         const result = await client.query(
           `INSERT INTO questionnaire_versions
-           (questionnaire_id, version, title, description, definition, created_at)
-           VALUES ($1, 1, $2, $3, $4, NOW())
-           RETURNING version, created_at`,
+           (questionnaire_id, version, title, description, definition, metadata, created_at)
+           VALUES ($1, 1, $2, $3, $4, $5, NOW())
+           RETURNING version, created_at, metadata`,
           [
             definition.id,
             definition.title,
             definition.description || null,
             JSON.stringify(definition),
+            JSON.stringify(metadata),
           ]
         );
 
@@ -76,6 +98,7 @@ export function createQuestionnaireRepository(pool: Pool): QuestionnaireReposito
           ...definition,
           version: result.rows[0].version,
           createdAt: result.rows[0].created_at,
+          metadata: result.rows[0].metadata,
         };
       } catch (error: any) {
         await client.query('ROLLBACK');
@@ -93,7 +116,7 @@ export function createQuestionnaireRepository(pool: Pool): QuestionnaireReposito
 
     async findById(id: string): Promise<QuestionnaireWithVersion | null> {
       const result = await pool.query(
-        `SELECT definition, version, created_at
+        `SELECT definition, version, created_at, metadata
          FROM questionnaire_versions
          WHERE questionnaire_id = $1
          ORDER BY version DESC
@@ -110,12 +133,13 @@ export function createQuestionnaireRepository(pool: Pool): QuestionnaireReposito
         ...row.definition,
         version: row.version,
         createdAt: row.created_at,
+        metadata: row.metadata || {},
       };
     },
 
     async findByIdAndVersion(id: string, version: number): Promise<QuestionnaireWithVersion | null> {
       const result = await pool.query(
-        `SELECT definition, version, created_at
+        `SELECT definition, version, created_at, metadata
          FROM questionnaire_versions
          WHERE questionnaire_id = $1 AND version = $2`,
         [id, version]
@@ -130,11 +154,13 @@ export function createQuestionnaireRepository(pool: Pool): QuestionnaireReposito
         ...row.definition,
         version: row.version,
         createdAt: row.created_at,
+        metadata: row.metadata || {},
       };
     },
 
-    async update(id: string, definition: QuestionnaireDefinition): Promise<QuestionnaireWithVersion> {
+    async update(id: string, definition: QuestionnaireDefinition, options: UpdateQuestionnaireOptions = {}): Promise<QuestionnaireWithVersion> {
       const client = await pool.connect();
+      const metadata = options.metadata || {};
       try {
         await client.query('BEGIN');
 
@@ -159,15 +185,16 @@ export function createQuestionnaireRepository(pool: Pool): QuestionnaireReposito
         // Insert new version
         const result = await client.query(
           `INSERT INTO questionnaire_versions
-           (questionnaire_id, version, title, description, definition, created_at)
-           VALUES ($1, $2, $3, $4, $5, NOW())
-           RETURNING version, created_at`,
+           (questionnaire_id, version, title, description, definition, metadata, created_at)
+           VALUES ($1, $2, $3, $4, $5, $6, NOW())
+           RETURNING version, created_at, metadata`,
           [
             id,
             nextVersion,
             definition.title,
             definition.description || null,
             JSON.stringify(definition),
+            JSON.stringify(metadata),
           ]
         );
 
@@ -184,6 +211,7 @@ export function createQuestionnaireRepository(pool: Pool): QuestionnaireReposito
           id,
           version: result.rows[0].version,
           createdAt: result.rows[0].created_at,
+          metadata: result.rows[0].metadata,
         };
       } catch (error) {
         await client.query('ROLLBACK');

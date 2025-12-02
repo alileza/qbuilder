@@ -4,6 +4,9 @@ export {
   type QuestionnaireWithVersion,
   type VersionMetadata,
   type QuestionnaireListItem,
+  type Metadata,
+  type CreateQuestionnaireOptions,
+  type UpdateQuestionnaireOptions,
 } from './questionnaire-repository.js';
 
 export {
@@ -12,4 +15,5 @@ export {
   type Submission,
   type SubmissionListOptions,
   type SubmissionListResult,
+  type CreateSubmissionOptions,
 } from './submission-repository.js';

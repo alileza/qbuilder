@@ -1,6 +1,7 @@
 import type { Pool } from 'pg';
 import type { AnswerPayload } from '../schemas/index.js';
 import { NotFoundError } from '../errors/index.js';
+import type { Metadata } from './questionnaire-repository.js';
 
 /**
  * Submission data
@@ -10,6 +11,7 @@ export interface Submission {
   questionnaireId: string;
   questionnaireVersion: number;
   answers: AnswerPayload;
+  metadata: Metadata;
   createdAt: Date;
 }
 
@@ -33,13 +35,21 @@ export interface SubmissionListResult {
 }
 
 /**
+ * Options for creating a submission
+ */
+export interface CreateSubmissionOptions {
+  metadata?: Metadata;
+}
+
+/**
  * Submission repository interface
  */
 export interface SubmissionRepository {
   create(
     questionnaireId: string,
     version: number,
-    answers: AnswerPayload
+    answers: AnswerPayload,
+    options?: CreateSubmissionOptions
   ): Promise<Submission>;
   findById(submissionId: string): Promise<Submission | null>;
   listByQuestionnaire(
@@ -56,15 +66,17 @@ export function createSubmissionRepository(pool: Pool): SubmissionRepository {
     async create(
       questionnaireId: string,
       version: number,
-      answers: AnswerPayload
+      answers: AnswerPayload,
+      options: CreateSubmissionOptions = {}
     ): Promise<Submission> {
+      const metadata = options.metadata || {};
       try {
         const result = await pool.query(
           `INSERT INTO submissions
-           (questionnaire_id, questionnaire_version, answers, created_at)
-           VALUES ($1, $2, $3, NOW())
-           RETURNING id, questionnaire_id, questionnaire_version, answers, created_at`,
-          [questionnaireId, version, JSON.stringify(answers)]
+           (questionnaire_id, questionnaire_version, answers, metadata, created_at)
+           VALUES ($1, $2, $3, $4, NOW())
+           RETURNING id, questionnaire_id, questionnaire_version, answers, metadata, created_at`,
+          [questionnaireId, version, JSON.stringify(answers), JSON.stringify(metadata)]
         );
 
         const row = result.rows[0];
@@ -73,6 +85,7 @@ export function createSubmissionRepository(pool: Pool): SubmissionRepository {
           questionnaireId: row.questionnaire_id,
           questionnaireVersion: row.questionnaire_version,
           answers: row.answers,
+          metadata: row.metadata,
           createdAt: row.created_at,
         };
       } catch (error: any) {
@@ -88,7 +101,7 @@ export function createSubmissionRepository(pool: Pool): SubmissionRepository {
 
     async findById(submissionId: string): Promise<Submission | null> {
       const result = await pool.query(
-        `SELECT id, questionnaire_id, questionnaire_version, answers, created_at
+        `SELECT id, questionnaire_id, questionnaire_version, answers, metadata, created_at
          FROM submissions
          WHERE id = $1`,
         [submissionId]
@@ -104,6 +117,7 @@ export function createSubmissionRepository(pool: Pool): SubmissionRepository {
         questionnaireId: row.questionnaire_id,
         questionnaireVersion: row.questionnaire_version,
         answers: row.answers,
+        metadata: row.metadata || {},
         createdAt: row.created_at,
       };
     },
@@ -137,7 +151,7 @@ export function createSubmissionRepository(pool: Pool): SubmissionRepository {
 
       // Get submissions
       const result = await pool.query(
-        `SELECT id, questionnaire_id, questionnaire_version, answers, created_at
+        `SELECT id, questionnaire_id, questionnaire_version, answers, metadata, created_at
          FROM submissions
          WHERE ${whereClause}
          ORDER BY created_at DESC
@@ -150,6 +164,7 @@ export function createSubmissionRepository(pool: Pool): SubmissionRepository {
         questionnaireId: row.questionnaire_id,
         questionnaireVersion: row.questionnaire_version,
         answers: row.answers,
+        metadata: row.metadata || {},
         createdAt: row.created_at,
       }));
 

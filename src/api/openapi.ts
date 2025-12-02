@@ -48,7 +48,20 @@ export const openApiSpec = {
           required: true,
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/QuestionnaireDefinition' },
+              schema: {
+                allOf: [
+                  { $ref: '#/components/schemas/QuestionnaireDefinition' },
+                  {
+                    type: 'object',
+                    properties: {
+                      metadata: {
+                        $ref: '#/components/schemas/Metadata',
+                        description: 'Optional metadata to store with the questionnaire',
+                      },
+                    },
+                  },
+                ],
+              },
             },
           },
         },
@@ -117,7 +130,20 @@ export const openApiSpec = {
           required: true,
           content: {
             'application/json': {
-              schema: { $ref: '#/components/schemas/QuestionnaireDefinition' },
+              schema: {
+                allOf: [
+                  { $ref: '#/components/schemas/QuestionnaireDefinition' },
+                  {
+                    type: 'object',
+                    properties: {
+                      metadata: {
+                        $ref: '#/components/schemas/Metadata',
+                        description: 'Optional metadata to store with the questionnaire version',
+                      },
+                    },
+                  },
+                ],
+              },
             },
           },
         },
@@ -345,6 +371,10 @@ export const openApiSpec = {
                     additionalProperties: true,
                     description: 'Answer payload',
                   },
+                  metadata: {
+                    $ref: '#/components/schemas/Metadata',
+                    description: 'Optional metadata to store with the submission',
+                  },
                 },
                 required: ['answers'],
               },
@@ -481,10 +511,11 @@ export const openApiSpec = {
           { $ref: '#/components/schemas/QuestionnaireDefinition' },
           {
             type: 'object',
-            required: ['version', 'createdAt'],
+            required: ['version', 'createdAt', 'metadata'],
             properties: {
               version: { type: 'integer', description: 'Version number' },
               createdAt: { type: 'string', format: 'date-time', description: 'Creation timestamp' },
+              metadata: { $ref: '#/components/schemas/Metadata' },
             },
           },
         ],
@@ -598,14 +629,20 @@ export const openApiSpec = {
       },
       Submission: {
         type: 'object',
-        required: ['id', 'questionnaireId', 'questionnaireVersion', 'answers', 'createdAt'],
+        required: ['id', 'questionnaireId', 'questionnaireVersion', 'answers', 'metadata', 'createdAt'],
         properties: {
           id: { type: 'string', format: 'uuid' },
           questionnaireId: { type: 'string' },
           questionnaireVersion: { type: 'integer' },
           answers: { type: 'object', additionalProperties: true },
+          metadata: { $ref: '#/components/schemas/Metadata' },
           createdAt: { type: 'string', format: 'date-time' },
         },
+      },
+      Metadata: {
+        type: 'object',
+        additionalProperties: true,
+        description: 'Arbitrary metadata object for storing custom data',
       },
       ValidationErrorDetail: {
         type: 'object',

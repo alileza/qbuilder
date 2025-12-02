@@ -11,7 +11,7 @@ export async function handleSubmitAnswers(
   questionnaireRepo: QuestionnaireRepository,
   submissionRepo: SubmissionRepository,
   id: string,
-  body: { version?: number; answers: Record<string, unknown> }
+  body: { version?: number; answers: Record<string, unknown>; metadata?: Record<string, unknown> }
 ): Promise<HandlerResult<{ submission: any }>> {
   // Get the questionnaire
   const questionnaire = body.version
@@ -33,11 +33,12 @@ export async function handleSubmitAnswers(
     throw new ValidationError('Answer validation failed', validationResult.errors);
   }
 
-  // Create the submission
+  // Create the submission with optional metadata
   const submission = await submissionRepo.create(
     questionnaire.id,
     questionnaire.version,
-    body.answers
+    body.answers,
+    { metadata: body.metadata }
   );
 
   return {

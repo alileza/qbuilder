@@ -40,7 +40,7 @@ describe('QuestionnaireRepository', () => {
         .mockResolvedValueOnce({ rows: [] }) // BEGIN
         .mockResolvedValueOnce({ rows: [] }) // INSERT questionnaires
         .mockResolvedValueOnce({
-          rows: [{ version: 1, created_at: now }],
+          rows: [{ version: 1, created_at: now, metadata: {} }],
         }) // INSERT version
         .mockResolvedValueOnce({ rows: [] }); // COMMIT
 
@@ -51,6 +51,7 @@ describe('QuestionnaireRepository', () => {
         ...sampleQuestionnaire,
         version: 1,
         createdAt: now,
+        metadata: {},
       });
 
       expect(mockClient.query).toHaveBeenCalledWith('BEGIN');
@@ -108,6 +109,7 @@ describe('QuestionnaireRepository', () => {
             definition: sampleQuestionnaire,
             version: 2,
             created_at: now,
+            metadata: { source: 'test' },
           },
         ],
       });
@@ -119,6 +121,7 @@ describe('QuestionnaireRepository', () => {
         ...sampleQuestionnaire,
         version: 2,
         createdAt: now,
+        metadata: { source: 'test' },
       });
 
       expect(mockPool.query).toHaveBeenCalledWith(
@@ -146,6 +149,7 @@ describe('QuestionnaireRepository', () => {
             definition: sampleQuestionnaire,
             version: 1,
             created_at: now,
+            metadata: {},
           },
         ],
       });
@@ -157,6 +161,7 @@ describe('QuestionnaireRepository', () => {
         ...sampleQuestionnaire,
         version: 1,
         createdAt: now,
+        metadata: {},
       });
 
       expect(mockPool.query).toHaveBeenCalledWith(
@@ -189,7 +194,7 @@ describe('QuestionnaireRepository', () => {
         .mockResolvedValueOnce({ rows: [{ id: 'onboarding' }] }) // Check exists
         .mockResolvedValueOnce({ rows: [{ max_version: 2 }] }) // Get max version
         .mockResolvedValueOnce({
-          rows: [{ version: 3, created_at: now }],
+          rows: [{ version: 3, created_at: now, metadata: {} }],
         }) // INSERT new version
         .mockResolvedValueOnce({ rows: [] }) // UPDATE updated_at
         .mockResolvedValueOnce({ rows: [] }); // COMMIT
@@ -202,6 +207,7 @@ describe('QuestionnaireRepository', () => {
         id: 'onboarding',
         version: 3,
         createdAt: now,
+        metadata: {},
       });
 
       expect(mockClient.query).toHaveBeenCalledWith('BEGIN');

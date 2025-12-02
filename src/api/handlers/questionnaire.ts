@@ -12,17 +12,28 @@ export interface HandlerResult<T> {
 }
 
 /**
+ * Create questionnaire body
+ */
+interface CreateQuestionnaireBody {
+  metadata?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+/**
  * Create a new questionnaire
  */
 export async function handleCreateQuestionnaire(
   repo: QuestionnaireRepository,
   body: unknown
 ): Promise<HandlerResult<{ questionnaire: any }>> {
-  // Validate and parse the questionnaire definition
-  const definition = parseQuestionnaire(body);
+  const typedBody = body as CreateQuestionnaireBody;
+  const { metadata, ...definitionBody } = typedBody;
 
-  // Create the questionnaire
-  const questionnaire = await repo.create(definition);
+  // Validate and parse the questionnaire definition
+  const definition = parseQuestionnaire(definitionBody);
+
+  // Create the questionnaire with optional metadata
+  const questionnaire = await repo.create(definition, { metadata });
 
   return {
     status: 201,
@@ -72,6 +83,14 @@ export async function handleGetQuestionnaireVersion(
 }
 
 /**
+ * Update questionnaire body
+ */
+interface UpdateQuestionnaireBody {
+  metadata?: Record<string, unknown>;
+  [key: string]: unknown;
+}
+
+/**
  * Update a questionnaire (creates a new version)
  */
 export async function handleUpdateQuestionnaire(
@@ -79,16 +98,19 @@ export async function handleUpdateQuestionnaire(
   id: string,
   body: unknown
 ): Promise<HandlerResult<{ questionnaire: any }>> {
+  const typedBody = body as UpdateQuestionnaireBody;
+  const { metadata, ...definitionBody } = typedBody;
+
   // Validate and parse the questionnaire definition
-  const definition = parseQuestionnaire(body);
+  const definition = parseQuestionnaire(definitionBody);
 
   // Ensure the ID in the body matches the URL parameter
   if (definition.id !== id) {
     definition.id = id;
   }
 
-  // Update the questionnaire (creates new version)
-  const questionnaire = await repo.update(id, definition);
+  // Update the questionnaire (creates new version) with optional metadata
+  const questionnaire = await repo.update(id, definition, { metadata });
 
   return {
     status: 200,
