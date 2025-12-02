@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Router, json } from 'express';
 import type { QuestionnaireRepository } from '../db/questionnaire-repository.js';
 import type { SubmissionRepository } from '../db/submission-repository.js';
 import {
@@ -51,8 +51,7 @@ export function createQuestionnaireRouter(options: RouterOptions): Router {
 
   // Apply JSON body parser if enabled
   if (enableJsonParser) {
-    const express = require('express');
-    router.use(express.json());
+    router.use(json());
   }
 
   // Questionnaire endpoints
