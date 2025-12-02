@@ -61,7 +61,7 @@ The server will start on http://localhost:3000
 ## Project Structure
 
 ```
-example/
+examples/
 ├── docker-compose.yml          # PostgreSQL database (port 5437)
 ├── package.json                # Dependencies and scripts
 ├── tsconfig.json               # TypeScript configuration
@@ -70,7 +70,7 @@ example/
 │   └── customer-feedback.json
 └── src/
     ├── index.ts                # Main application
-    └── migrate.ts              # Database migration script
+    └── migrate.ts              # Database migration script (standalone)
 ```
 
 ## Available Scripts
@@ -110,7 +110,7 @@ curl http://localhost:3000/api/questionnaires/employee-onboarding/versions
 
 ```bash
 # Submit answers
-curl -X POST http://localhost:3000/api/questionnaires/employee-onboarding/submit \
+curl -X POST http://localhost:3000/api/questionnaires/employee-onboarding/submissions \
   -H "Content-Type: application/json" \
   -d '{
     "answers": {
@@ -120,6 +120,23 @@ curl -X POST http://localhost:3000/api/questionnaires/employee-onboarding/submit
       "yearsOfExperience": "5",
       "department": "engineering",
       "startDate": "2025-01-15"
+    }
+  }'
+
+# Submit with metadata
+curl -X POST http://localhost:3000/api/questionnaires/employee-onboarding/submissions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "answers": {
+      "fullName": "Jane Smith",
+      "email": "jane@example.com",
+      "hasExperience": "no",
+      "department": "sales",
+      "startDate": "2025-02-01"
+    },
+    "metadata": {
+      "source": "web-form",
+      "sessionId": "abc123"
     }
   }'
 
@@ -144,7 +161,7 @@ curl -X POST http://localhost:3000/api/questionnaires/employee-onboarding/valida
   }'
 
 # Get visible questions based on answers
-curl -X POST http://localhost:3000/api/questionnaires/employee-onboarding/visible \
+curl -X POST http://localhost:3000/api/questionnaires/employee-onboarding/visible-questions \
   -H "Content-Type: application/json" \
   -d '{
     "answers": {
@@ -244,7 +261,7 @@ npm run db:logs
 npm run db:down
 
 # Remove volume and start fresh
-docker volume rm example_postgres_data
+docker volume rm examples_postgres_data
 
 # Start database and run migrations
 npm run db:up
@@ -270,7 +287,7 @@ To stop and remove everything:
 npm run db:down
 
 # Remove volumes (deletes all data)
-docker volume rm example_postgres_data
+docker volume rm examples_postgres_data
 
 # Remove node_modules
 rm -rf node_modules dist

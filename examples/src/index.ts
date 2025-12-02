@@ -95,7 +95,7 @@ async function initializeApp() {
     console.log(`   curl http://localhost:${PORT}/api/questionnaires`);
     console.log(`   curl http://localhost:${PORT}/api/questionnaires/employee-onboarding`);
     console.log('\n💡 Example submission:');
-    console.log(`   curl -X POST http://localhost:${PORT}/api/questionnaires/employee-onboarding/submit \\`);
+    console.log(`   curl -X POST http://localhost:${PORT}/api/questionnaires/employee-onboarding/submissions \\`);
     console.log(`     -H "Content-Type: application/json" \\`);
     console.log(`     -d '{"answers": {"fullName": "John Doe", "email": "john@example.com", "hasExperience": "yes", "yearsOfExperience": "5", "department": "engineering", "startDate": "2025-01-15"}}'`);
   });
