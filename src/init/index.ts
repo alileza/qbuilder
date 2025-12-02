@@ -2,21 +2,36 @@
  * Questionnaire initialization module
  *
  * Provides utilities for loading and registering questionnaires from files
- * during application startup.
+ * during application startup, with optional automatic database migrations.
  *
  * @module init
  */
 
 import { readFile, readdir } from 'fs/promises';
 import { join, extname } from 'path';
+import type { Pool } from 'pg';
 import { parseQuestionnaire } from '../engine/index.js';
 import type { QuestionnaireRepository, QuestionnaireWithVersion } from '../db/questionnaire-repository.js';
 import type { QuestionnaireDefinition } from '../schemas/questionnaire.js';
+import { runMigrations, type MigrationResult } from '../db/migrations.js';
 
 /**
  * Options for initializing questionnaires
  */
 export interface InitializeOptions {
+  /**
+   * PostgreSQL connection pool
+   * Required if runMigrations is true
+   */
+  pool?: Pool;
+
+  /**
+   * If true, run database migrations before initializing questionnaires
+   * Requires pool to be provided
+   * Default: false
+   */
+  runMigrations?: boolean;
+
   /**
    * Array of file paths to load questionnaires from
    * Supports .json files
@@ -52,6 +67,11 @@ export interface InitializeOptions {
  * Result of questionnaire initialization
  */
 export interface InitializeResult {
+  /**
+   * Migration results (if runMigrations was true)
+   */
+  migrations?: MigrationResult;
+
   /**
    * Number of questionnaires successfully initialized
    */
@@ -187,6 +207,13 @@ function areDefinitionsEqual(
  *   ]
  * });
  *
+ * // Combined: run migrations and load questionnaires
+ * const result = await initializeQuestionnaires(repo, {
+ *   pool: pool,
+ *   runMigrations: true,
+ *   directory: './questionnaires'
+ * });
+ *
  * console.log(`Initialized: ${result.initialized}, Skipped: ${result.skipped}, Errors: ${result.errors.length}`);
  * ```
  */
@@ -199,6 +226,14 @@ export async function initializeQuestionnaires(
     skipped: 0,
     errors: [],
   };
+
+  // Run migrations if requested
+  if (options.runMigrations) {
+    if (!options.pool) {
+      throw new Error('pool is required when runMigrations is true');
+    }
+    result.migrations = await runMigrations(options.pool);
+  }
 
   const definitions: QuestionnaireDefinition[] = [];
 

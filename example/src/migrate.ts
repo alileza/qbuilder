@@ -1,16 +1,15 @@
 /**
- * Database migration script
+ * Database migration script (standalone)
  *
- * Runs the SQL migrations to set up the database schema
+ * This script runs migrations independently from the application.
+ * Useful for CI/CD pipelines or manual migration runs.
+ *
+ * Note: Migrations also run automatically when using initializeQuestionnaires
+ * with the runMigrations option.
  */
 
 import { Pool } from 'pg';
-import { readFile } from 'fs/promises';
-import { join, dirname } from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
+import { runMigrations } from 'qbuilder';
 
 const pool = new Pool({
   host: 'localhost',
@@ -20,35 +19,18 @@ const pool = new Pool({
   password: 'qbuilder123',
 });
 
-async function runMigration(name: string, sql: string): Promise<void> {
-  console.log(`Running migration: ${name}...`);
-  try {
-    await pool.query(sql);
-    console.log(`✅ ${name} completed`);
-  } catch (error) {
-    console.error(`❌ ${name} failed:`, error);
-    throw error;
-  }
-}
-
 async function main() {
   try {
     console.log('Starting database migrations...\n');
 
-    // Read migration files from qbuilder package
-    const migrationsPath = join(__dirname, '../../node_modules/qbuilder/src/db/migrations');
+    const result = await runMigrations(pool);
 
-    const migration1 = await readFile(
-      join(migrationsPath, '001_create_questionnaires.sql'),
-      'utf-8'
-    );
-    const migration2 = await readFile(
-      join(migrationsPath, '002_create_submissions.sql'),
-      'utf-8'
-    );
+    console.log('Migration results:');
+    console.log(`  ✅ Executed: ${result.executed.length}`);
+    result.executed.forEach((name) => console.log(`     - ${name}`));
 
-    await runMigration('001_create_questionnaires', migration1);
-    await runMigration('002_create_submissions', migration2);
+    console.log(`  ⏭️  Skipped: ${result.skipped.length}`);
+    result.skipped.forEach((name) => console.log(`     - ${name}`));
 
     console.log('\n✅ All migrations completed successfully!');
   } catch (error) {

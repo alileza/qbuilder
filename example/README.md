@@ -5,6 +5,7 @@ A complete end-to-end example of using the `qbuilder` package to build a questio
 ## Features Demonstrated
 
 - ✅ PostgreSQL database setup with Docker Compose
+- ✅ **Automatic migrations** on startup
 - ✅ File-based questionnaire initialization
 - ✅ REST API with Express
 - ✅ Smart versioning (no duplicate versions on restart)
@@ -40,14 +41,7 @@ npm run db:logs
 npm install
 ```
 
-### 3. Run Database Migrations
-
-```bash
-npm run build
-npm run db:migrate
-```
-
-### 4. Start the Application
+### 3. Start the Application
 
 ```bash
 npm run dev
@@ -57,11 +51,12 @@ The server will start on http://localhost:3000
 
 ## What Happens on Startup
 
-1. **Questionnaire Initialization**: Loads all `.json` files from `./questionnaires/` directory
-2. **Smart Versioning**:
+1. **Automatic Migrations**: Database schema is created/updated automatically
+2. **Questionnaire Initialization**: Loads all `.json` files from `./questionnaires/` directory
+3. **Smart Versioning**:
    - First run: Creates version 1 for each questionnaire
    - Subsequent runs: Only creates new versions if content changed
-3. **API Ready**: Express server starts with all endpoints available
+4. **API Ready**: Express server starts with all endpoints available
 
 ## Project Structure
 
@@ -88,7 +83,8 @@ example/
 | `npm run db:up` | Start PostgreSQL container |
 | `npm run db:down` | Stop PostgreSQL container |
 | `npm run db:logs` | View PostgreSQL logs |
-| `npm run db:migrate` | Run database migrations |
+
+> **Note:** Migrations run automatically on app startup - no separate migration step needed!
 
 ## API Endpoints
 

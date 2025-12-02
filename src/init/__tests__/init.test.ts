@@ -449,4 +449,94 @@ describe('initializeQuestionnaires', () => {
       expect(result.errors).toHaveLength(0);
     });
   });
+
+  describe('runMigrations option', () => {
+    it('should throw error if runMigrations is true but pool is not provided', async () => {
+      await expect(
+        initializeQuestionnaires(mockRepo, {
+          runMigrations: true,
+        })
+      ).rejects.toThrow('pool is required when runMigrations is true');
+    });
+
+    it('should run migrations when runMigrations is true and pool is provided', async () => {
+      const mockPool = {
+        query: vi.fn()
+          .mockResolvedValueOnce({}) // Create migrations table
+          .mockResolvedValueOnce({ rows: [] }) // Get applied migrations (none)
+          .mockResolvedValueOnce({}) // Run migration 1
+          .mockResolvedValueOnce({}) // Mark migration 1 applied
+          .mockResolvedValueOnce({}) // Run migration 2
+          .mockResolvedValueOnce({}) // Mark migration 2 applied
+          .mockResolvedValueOnce({}) // Run migration 3
+          .mockResolvedValueOnce({}), // Mark migration 3 applied
+      };
+
+      const result = await initializeQuestionnaires(mockRepo, {
+        pool: mockPool as any,
+        runMigrations: true,
+      });
+
+      expect(result.migrations).toBeDefined();
+      expect(result.migrations!.executed).toHaveLength(3);
+      expect(result.migrations!.skipped).toHaveLength(0);
+    });
+
+    it('should include migration results showing skipped migrations', async () => {
+      const mockPool = {
+        query: vi.fn()
+          .mockResolvedValueOnce({}) // Create migrations table
+          .mockResolvedValueOnce({
+            rows: [
+              { name: '001_create_questionnaires' },
+              { name: '002_create_submissions' },
+              { name: '003_add_metadata_column' },
+            ],
+          }), // All migrations already applied
+      };
+
+      const result = await initializeQuestionnaires(mockRepo, {
+        pool: mockPool as any,
+        runMigrations: true,
+      });
+
+      expect(result.migrations).toBeDefined();
+      expect(result.migrations!.executed).toHaveLength(0);
+      expect(result.migrations!.skipped).toHaveLength(3);
+    });
+
+    it('should run migrations before loading questionnaires', async () => {
+      const callOrder: string[] = [];
+
+      const mockPool = {
+        query: vi.fn().mockImplementation(() => {
+          callOrder.push('migration');
+          return Promise.resolve({ rows: [
+            { name: '001_create_questionnaires' },
+            { name: '002_create_submissions' },
+            { name: '003_add_metadata_column' },
+          ] });
+        }),
+      };
+
+      // Override mock to track call order
+      createSpy.mockImplementation(() => {
+        callOrder.push('create');
+        return Promise.resolve({ id: 'test', version: 1 });
+      });
+
+      const files = [join(fixturesDir, 'questionnaires', 'onboarding.json')];
+
+      await initializeQuestionnaires(mockRepo, {
+        pool: mockPool as any,
+        runMigrations: true,
+        files,
+      });
+
+      // Migrations should be called before create
+      const migrationIndex = callOrder.indexOf('migration');
+      const createIndex = callOrder.indexOf('create');
+      expect(migrationIndex).toBeLessThan(createIndex);
+    });
+  });
 });

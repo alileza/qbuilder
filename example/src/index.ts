@@ -2,7 +2,7 @@
  * QBuilder Example Application
  *
  * This example demonstrates:
- * 1. Database setup with PostgreSQL
+ * 1. Database setup with PostgreSQL (with auto-migrations)
  * 2. Loading questionnaires from JSON files
  * 3. Creating a REST API with Express
  * 4. Submitting and validating answers
@@ -33,13 +33,23 @@ const submissionRepo = createSubmissionRepository(pool);
 async function initializeApp() {
   console.log('🚀 Initializing QBuilder Example Application...\n');
 
-  // Step 1: Initialize questionnaires from files
-  console.log('📂 Loading questionnaires from files...');
+  // Combined: Run migrations and load questionnaires from files
+  console.log('📦 Running migrations and loading questionnaires...');
   const initResult = await initializeQuestionnaires(questionnaireRepo, {
+    pool, // Pass pool for migrations
+    runMigrations: true, // Run DB migrations automatically
     directory: './questionnaires',
     updateExisting: true, // Update if content changed
   });
 
+  // Show migration results
+  if (initResult.migrations) {
+    console.log(`\n🗄️  Migrations:`);
+    console.log(`   ✅ Executed: ${initResult.migrations.executed.length}`);
+    console.log(`   ⏭️  Skipped: ${initResult.migrations.skipped.length}`);
+  }
+
+  console.log(`\n📂 Questionnaires:`);
   console.log(`   ✅ Initialized: ${initResult.initialized}`);
   console.log(`   ⏭️  Skipped: ${initResult.skipped}`);
   console.log(`   ❌ Errors: ${initResult.errors.length}`);

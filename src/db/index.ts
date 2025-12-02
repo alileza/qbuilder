@@ -17,3 +17,10 @@ export {
   type SubmissionListResult,
   type CreateSubmissionOptions,
 } from './submission-repository.js';
+
+export {
+  runMigrations,
+  migrations,
+  type Migration,
+  type MigrationResult,
+} from './migrations.js';
