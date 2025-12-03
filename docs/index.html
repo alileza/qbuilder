@@ -1,0 +1,1223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QBuilder Questionnaire Visualizer</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        .panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            background: #fff;
+            border-bottom: 1px solid #e0e0e0;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-content {
+            flex: 1;
+            overflow: auto;
+            padding: 20px;
+        }
+
+        .left-panel {
+            border-right: 1px solid #e0e0e0;
+            background: #1e1e1e;
+        }
+
+        .left-panel .panel-header {
+            background: #252526;
+            color: #ccc;
+            border-bottom-color: #3c3c3c;
+        }
+
+        .left-panel .panel-content {
+            padding: 0;
+        }
+
+        #json-input {
+            width: 100%;
+            height: 100%;
+            background: #1e1e1e;
+            color: #d4d4d4;
+            border: none;
+            padding: 20px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            resize: none;
+            outline: none;
+            line-height: 1.5;
+        }
+
+        .right-panel {
+            background: #fafafa;
+        }
+
+        .error-banner {
+            background: #ffebee;
+            color: #c62828;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            border: 1px solid #ffcdd2;
+        }
+
+        .questionnaire {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .questionnaire-header {
+            margin-bottom: 32px;
+        }
+
+        .questionnaire-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1a1a1a;
+            margin-bottom: 8px;
+        }
+
+        .questionnaire-description {
+            color: #666;
+            font-size: 16px;
+        }
+
+        .section {
+            margin-bottom: 32px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .section-header {
+            padding: 20px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .section-description {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .section-questions {
+            padding: 24px;
+        }
+
+        .question {
+            margin-bottom: 24px;
+            padding-bottom: 24px;
+            border-bottom: 1px solid #eee;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .question:last-child {
+            margin-bottom: 0;
+            padding-bottom: 0;
+            border-bottom: none;
+        }
+
+        .question.hidden {
+            display: none;
+        }
+
+        .question-label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+            font-size: 15px;
+        }
+
+        .question-label .required {
+            color: #e53935;
+            margin-left: 4px;
+        }
+
+        .help-text {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 12px;
+            padding-left: 12px;
+            border-left: 3px solid #e0e0e0;
+        }
+
+        input[type="text"],
+        textarea {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            background: #fff;
+        }
+
+        input[type="text"]:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.15);
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .char-count {
+            font-size: 12px;
+            color: #999;
+            text-align: right;
+            margin-top: 4px;
+        }
+
+        .char-count.warning {
+            color: #ff9800;
+        }
+
+        .char-count.error {
+            color: #e53935;
+        }
+
+        .choice-options {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .choice-option {
+            display: flex;
+            align-items: center;
+            padding: 12px 14px;
+            background: #f8f9fa;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .choice-option:hover {
+            background: #f0f0f0;
+        }
+
+        .choice-option.selected {
+            background: #e8eaf6;
+            border-color: #667eea;
+        }
+
+        .choice-option input {
+            margin-right: 12px;
+            width: 18px;
+            height: 18px;
+            accent-color: #667eea;
+        }
+
+        .choice-option label {
+            cursor: pointer;
+            flex: 1;
+            font-size: 15px;
+        }
+
+        .no-sections {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            padding: 24px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .examples-dropdown {
+            position: relative;
+        }
+
+        .examples-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 200px;
+            z-index: 100;
+            margin-top: 4px;
+        }
+
+        .examples-menu.show {
+            display: block;
+        }
+
+        .examples-menu button {
+            width: 100%;
+            padding: 10px 16px;
+            border: none;
+            background: none;
+            text-align: left;
+            cursor: pointer;
+            font-size: 13px;
+            color: #333;
+        }
+
+        .examples-menu button:hover {
+            background: #f5f5f5;
+        }
+
+        .examples-menu button:first-child {
+            border-radius: 8px 8px 0 0;
+        }
+
+        .examples-menu button:last-child {
+            border-radius: 0 0 8px 8px;
+        }
+
+        .divider {
+            width: 4px;
+            background: #e0e0e0;
+            cursor: col-resize;
+            transition: background 0.2s;
+        }
+
+        .divider:hover {
+            background: #667eea;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            color: #666;
+        }
+
+        .empty-state p {
+            font-size: 14px;
+        }
+
+        .answers-panel {
+            margin-top: 32px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+
+        .answers-header {
+            padding: 16px 24px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #eee;
+            font-weight: 600;
+            font-size: 14px;
+            color: #666;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .answers-content {
+            padding: 16px 24px;
+        }
+
+        .answers-json {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 16px;
+            border-radius: 8px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 13px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="panel left-panel" id="leftPanel">
+            <div class="panel-header">
+                <span>JSON Definition</span>
+                <div class="examples-dropdown">
+                    <button class="btn btn-secondary" onclick="toggleExamples()">Load Example</button>
+                    <div class="examples-menu" id="examplesMenu">
+                        <button onclick="loadExample('simple')">Simple Form</button>
+                        <button onclick="loadExample('conditional')">Conditional Logic</button>
+                        <button onclick="loadExample('sections')">With Sections</button>
+                        <button onclick="loadExample('full')">Full Featured</button>
+                    </div>
+                </div>
+            </div>
+            <div class="panel-content">
+                <textarea id="json-input" placeholder="Paste your questionnaire JSON here..." spellcheck="false"></textarea>
+            </div>
+        </div>
+
+        <div class="divider" id="divider"></div>
+
+        <div class="panel right-panel" id="rightPanel">
+            <div class="panel-header">
+                <span>Form Preview</span>
+                <button class="btn btn-secondary" onclick="resetAnswers()">Reset Answers</button>
+            </div>
+            <div class="panel-content" id="preview">
+                <div class="empty-state">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                    </svg>
+                    <h3>No questionnaire loaded</h3>
+                    <p>Paste JSON in the left panel or load an example to get started</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // State
+        let questionnaire = null;
+        let answers = {};
+
+        // DOM Elements
+        const jsonInput = document.getElementById('json-input');
+        const preview = document.getElementById('preview');
+        const examplesMenu = document.getElementById('examplesMenu');
+
+        // Example questionnaires
+        const examples = {
+            simple: {
+                id: "simple-form",
+                title: "Simple Contact Form",
+                description: "A basic form with text and choice questions",
+                questions: [
+                    {
+                        id: "name",
+                        type: "text",
+                        label: "Full Name",
+                        required: true,
+                        helpText: "Enter your first and last name"
+                    },
+                    {
+                        id: "email",
+                        type: "text",
+                        label: "Email Address",
+                        required: true,
+                        maxLength: 100
+                    },
+                    {
+                        id: "message",
+                        type: "text",
+                        label: "Message",
+                        multiline: true,
+                        maxLength: 500,
+                        helpText: "Tell us what's on your mind"
+                    },
+                    {
+                        id: "priority",
+                        type: "choice",
+                        label: "Priority Level",
+                        options: [
+                            { value: "low", label: "Low" },
+                            { value: "medium", label: "Medium" },
+                            { value: "high", label: "High" }
+                        ]
+                    }
+                ]
+            },
+            conditional: {
+                id: "conditional-form",
+                title: "Conditional Logic Demo",
+                description: "Demonstrates how questions appear/hide based on answers",
+                questions: [
+                    {
+                        id: "hasAccount",
+                        type: "choice",
+                        label: "Do you have an existing account?",
+                        required: true,
+                        options: [
+                            { value: "yes", label: "Yes, I have an account" },
+                            { value: "no", label: "No, I'm new here" }
+                        ]
+                    },
+                    {
+                        id: "accountId",
+                        type: "text",
+                        label: "Account ID",
+                        helpText: "Enter your existing account ID",
+                        visibleIf: {
+                            all: [{ questionId: "hasAccount", operator: "equals", value: "yes" }]
+                        }
+                    },
+                    {
+                        id: "howHeard",
+                        type: "choice",
+                        label: "How did you hear about us?",
+                        visibleIf: {
+                            all: [{ questionId: "hasAccount", operator: "equals", value: "no" }]
+                        },
+                        options: [
+                            { value: "search", label: "Search Engine" },
+                            { value: "social", label: "Social Media" },
+                            { value: "friend", label: "Friend/Colleague" },
+                            { value: "other", label: "Other" }
+                        ]
+                    },
+                    {
+                        id: "otherSource",
+                        type: "text",
+                        label: "Please specify",
+                        visibleIf: {
+                            all: [
+                                { questionId: "hasAccount", operator: "equals", value: "no" },
+                                { questionId: "howHeard", operator: "equals", value: "other" }
+                            ]
+                        }
+                    },
+                    {
+                        id: "interests",
+                        type: "choice",
+                        label: "What are you interested in?",
+                        multiple: true,
+                        helpText: "Select all that apply",
+                        options: [
+                            { value: "product", label: "Product Updates" },
+                            { value: "blog", label: "Blog Posts" },
+                            { value: "events", label: "Events & Webinars" },
+                            { value: "newsletter", label: "Newsletter" }
+                        ]
+                    },
+                    {
+                        id: "eventPreference",
+                        type: "choice",
+                        label: "Preferred event format",
+                        visibleIf: {
+                            any: [
+                                { questionId: "interests", operator: "in", value: ["events"] }
+                            ]
+                        },
+                        options: [
+                            { value: "online", label: "Online/Virtual" },
+                            { value: "inperson", label: "In-Person" },
+                            { value: "both", label: "Both" }
+                        ]
+                    }
+                ]
+            },
+            sections: {
+                id: "sectioned-form",
+                title: "Employee Onboarding",
+                description: "A form organized into logical sections",
+                sections: [
+                    {
+                        id: "personal",
+                        title: "Personal Information",
+                        description: "Basic information about you",
+                        questionIds: ["fullName", "email", "phone"]
+                    },
+                    {
+                        id: "employment",
+                        title: "Employment Details",
+                        description: "Information about your role",
+                        questionIds: ["department", "startDate", "workType"]
+                    },
+                    {
+                        id: "preferences",
+                        title: "Preferences",
+                        description: "Help us set up your workspace",
+                        questionIds: ["equipment", "dietaryRestrictions"]
+                    }
+                ],
+                questions: [
+                    { id: "fullName", type: "text", label: "Full Name", required: true },
+                    { id: "email", type: "text", label: "Work Email", required: true },
+                    { id: "phone", type: "text", label: "Phone Number" },
+                    {
+                        id: "department",
+                        type: "choice",
+                        label: "Department",
+                        required: true,
+                        options: [
+                            { value: "engineering", label: "Engineering" },
+                            { value: "design", label: "Design" },
+                            { value: "product", label: "Product" },
+                            { value: "marketing", label: "Marketing" },
+                            { value: "sales", label: "Sales" },
+                            { value: "hr", label: "Human Resources" }
+                        ]
+                    },
+                    { id: "startDate", type: "text", label: "Start Date", helpText: "Format: YYYY-MM-DD" },
+                    {
+                        id: "workType",
+                        type: "choice",
+                        label: "Work Arrangement",
+                        options: [
+                            { value: "office", label: "Office" },
+                            { value: "remote", label: "Remote" },
+                            { value: "hybrid", label: "Hybrid" }
+                        ]
+                    },
+                    {
+                        id: "equipment",
+                        type: "choice",
+                        label: "Equipment Needed",
+                        multiple: true,
+                        options: [
+                            { value: "laptop", label: "Laptop" },
+                            { value: "monitor", label: "External Monitor" },
+                            { value: "keyboard", label: "Keyboard" },
+                            { value: "mouse", label: "Mouse" },
+                            { value: "headset", label: "Headset" }
+                        ]
+                    },
+                    {
+                        id: "dietaryRestrictions",
+                        type: "text",
+                        label: "Dietary Restrictions",
+                        multiline: true,
+                        helpText: "For team lunches and events"
+                    }
+                ]
+            },
+            full: {
+                id: "full-featured",
+                title: "Complete Feature Demo",
+                description: "Showcases all available question types and features",
+                sections: [
+                    {
+                        id: "basics",
+                        title: "Basic Questions",
+                        description: "Standard text and choice questions",
+                        questionIds: ["textSimple", "textMultiline", "textMaxLength", "choiceSingle", "choiceMultiple"]
+                    },
+                    {
+                        id: "conditions",
+                        title: "Conditional Questions",
+                        description: "Questions that appear based on previous answers",
+                        questionIds: ["trigger", "equalsDemo", "notEqualsDemo", "inDemo", "isAnsweredDemo", "numericValue", "gtDemo", "gteDemo"]
+                    }
+                ],
+                questions: [
+                    {
+                        id: "textSimple",
+                        type: "text",
+                        label: "Simple Text Input",
+                        required: true,
+                        helpText: "A basic single-line text input"
+                    },
+                    {
+                        id: "textMultiline",
+                        type: "text",
+                        label: "Multiline Text",
+                        multiline: true,
+                        helpText: "A textarea for longer responses"
+                    },
+                    {
+                        id: "textMaxLength",
+                        type: "text",
+                        label: "Text with Max Length",
+                        maxLength: 50,
+                        helpText: "Limited to 50 characters"
+                    },
+                    {
+                        id: "choiceSingle",
+                        type: "choice",
+                        label: "Single Choice (Radio)",
+                        required: true,
+                        helpText: "Select one option",
+                        options: [
+                            { value: "a", label: "Option A" },
+                            { value: "b", label: "Option B" },
+                            { value: "c", label: "Option C" }
+                        ]
+                    },
+                    {
+                        id: "choiceMultiple",
+                        type: "choice",
+                        label: "Multiple Choice (Checkboxes)",
+                        multiple: true,
+                        helpText: "Select all that apply",
+                        options: [
+                            { value: "1", label: "Choice 1" },
+                            { value: "2", label: "Choice 2" },
+                            { value: "3", label: "Choice 3" },
+                            { value: "4", label: "Choice 4" }
+                        ]
+                    },
+                    {
+                        id: "trigger",
+                        type: "choice",
+                        label: "Condition Trigger",
+                        helpText: "Change this to see conditional questions",
+                        options: [
+                            { value: "show", label: "Show 'equals' question" },
+                            { value: "hide", label: "Show 'notEquals' question" },
+                            { value: "special", label: "Show 'in' question" }
+                        ]
+                    },
+                    {
+                        id: "equalsDemo",
+                        type: "text",
+                        label: "Equals Condition",
+                        helpText: "Visible when trigger equals 'show'",
+                        visibleIf: {
+                            all: [{ questionId: "trigger", operator: "equals", value: "show" }]
+                        }
+                    },
+                    {
+                        id: "notEqualsDemo",
+                        type: "text",
+                        label: "Not Equals Condition",
+                        helpText: "Visible when trigger does NOT equal 'show'",
+                        visibleIf: {
+                            all: [{ questionId: "trigger", operator: "notEquals", value: "show" }]
+                        }
+                    },
+                    {
+                        id: "inDemo",
+                        type: "text",
+                        label: "In Condition",
+                        helpText: "Visible when trigger is 'show' OR 'special'",
+                        visibleIf: {
+                            any: [
+                                { questionId: "trigger", operator: "equals", value: "show" },
+                                { questionId: "trigger", operator: "equals", value: "special" }
+                            ]
+                        }
+                    },
+                    {
+                        id: "isAnsweredDemo",
+                        type: "text",
+                        label: "Is Answered Condition",
+                        helpText: "Visible when trigger has any answer",
+                        visibleIf: {
+                            all: [{ questionId: "trigger", operator: "isAnswered" }]
+                        }
+                    },
+                    {
+                        id: "numericValue",
+                        type: "text",
+                        label: "Enter a number (for numeric conditions)",
+                        helpText: "Enter a number to test gt/gte conditions"
+                    },
+                    {
+                        id: "gtDemo",
+                        type: "text",
+                        label: "Greater Than Demo",
+                        helpText: "Visible when numeric value > 5",
+                        visibleIf: {
+                            all: [{ questionId: "numericValue", operator: "gt", value: 5 }]
+                        }
+                    },
+                    {
+                        id: "gteDemo",
+                        type: "text",
+                        label: "Greater Than or Equal Demo",
+                        helpText: "Visible when numeric value >= 10",
+                        visibleIf: {
+                            all: [{ questionId: "numericValue", operator: "gte", value: 10 }]
+                        }
+                    }
+                ]
+            }
+        };
+
+        // Initialize
+        jsonInput.addEventListener('input', debounce(parseAndRender, 300));
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.examples-dropdown')) {
+                examplesMenu.classList.remove('show');
+            }
+        });
+
+        // Setup resizable divider
+        setupDivider();
+
+        // Functions
+        function debounce(fn, delay) {
+            let timeout;
+            return (...args) => {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => fn(...args), delay);
+            };
+        }
+
+        function toggleExamples() {
+            examplesMenu.classList.toggle('show');
+        }
+
+        function loadExample(name) {
+            const example = examples[name];
+            if (example) {
+                jsonInput.value = JSON.stringify(example, null, 2);
+                parseAndRender();
+            }
+            examplesMenu.classList.remove('show');
+        }
+
+        function parseAndRender() {
+            const json = jsonInput.value.trim();
+
+            if (!json) {
+                preview.innerHTML = `
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                            <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+                        </svg>
+                        <h3>No questionnaire loaded</h3>
+                        <p>Paste JSON in the left panel or load an example to get started</p>
+                    </div>
+                `;
+                questionnaire = null;
+                return;
+            }
+
+            try {
+                questionnaire = JSON.parse(json);
+                answers = {};
+                renderQuestionnaire();
+            } catch (e) {
+                preview.innerHTML = `<div class="error-banner">Invalid JSON: ${e.message}</div>`;
+            }
+        }
+
+        function renderQuestionnaire() {
+            if (!questionnaire) return;
+
+            let html = `
+                <div class="questionnaire">
+                    <div class="questionnaire-header">
+                        <h1 class="questionnaire-title">${escapeHtml(questionnaire.title || 'Untitled')}</h1>
+                        ${questionnaire.description ? `<p class="questionnaire-description">${escapeHtml(questionnaire.description)}</p>` : ''}
+                    </div>
+            `;
+
+            if (questionnaire.sections && questionnaire.sections.length > 0) {
+                // Render with sections
+                for (const section of questionnaire.sections) {
+                    html += renderSection(section);
+                }
+            } else {
+                // Render without sections
+                html += `<div class="no-sections">`;
+                for (const question of questionnaire.questions || []) {
+                    html += renderQuestion(question);
+                }
+                html += `</div>`;
+            }
+
+            // Add answers panel
+            html += `
+                <div class="answers-panel">
+                    <div class="answers-header">
+                        <span>Current Answers</span>
+                    </div>
+                    <div class="answers-content">
+                        <pre class="answers-json" id="answersJson">${escapeHtml(JSON.stringify(answers, null, 2))}</pre>
+                    </div>
+                </div>
+            `;
+
+            html += `</div>`;
+
+            preview.innerHTML = html;
+            updateVisibility();
+        }
+
+        function renderSection(section) {
+            const questions = (section.questionIds || [])
+                .map(id => questionnaire.questions.find(q => q.id === id))
+                .filter(Boolean);
+
+            let html = `
+                <div class="section">
+                    <div class="section-header">
+                        <h2 class="section-title">${escapeHtml(section.title)}</h2>
+                        ${section.description ? `<p class="section-description">${escapeHtml(section.description)}</p>` : ''}
+                    </div>
+                    <div class="section-questions">
+            `;
+
+            for (const question of questions) {
+                html += renderQuestion(question);
+            }
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            return html;
+        }
+
+        function renderQuestion(question) {
+            const isVisible = evaluateVisibility(question);
+            const hiddenClass = isVisible ? '' : 'hidden';
+
+            let html = `<div class="question ${hiddenClass}" data-question-id="${question.id}">`;
+
+            // Label
+            html += `
+                <label class="question-label">
+                    ${escapeHtml(question.label)}
+                    ${question.required ? '<span class="required">*</span>' : ''}
+                </label>
+            `;
+
+            // Help text
+            if (question.helpText) {
+                html += `<p class="help-text">${escapeHtml(question.helpText)}</p>`;
+            }
+
+            // Input based on type
+            if (question.type === 'text') {
+                html += renderTextQuestion(question);
+            } else if (question.type === 'choice') {
+                html += renderChoiceQuestion(question);
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        function renderTextQuestion(question) {
+            const value = answers[question.id] || '';
+            const maxLength = question.maxLength ? `maxlength="${question.maxLength}"` : '';
+
+            let html = '';
+
+            if (question.multiline) {
+                html += `<textarea
+                    id="input-${question.id}"
+                    ${maxLength}
+                    onchange="handleTextChange('${question.id}', this.value)"
+                    oninput="handleTextInput('${question.id}', this)"
+                    placeholder="Enter your answer..."
+                >${escapeHtml(value)}</textarea>`;
+            } else {
+                html += `<input
+                    type="text"
+                    id="input-${question.id}"
+                    ${maxLength}
+                    value="${escapeHtml(value)}"
+                    onchange="handleTextChange('${question.id}', this.value)"
+                    oninput="handleTextInput('${question.id}', this)"
+                    placeholder="Enter your answer..."
+                />`;
+            }
+
+            if (question.maxLength) {
+                const remaining = question.maxLength - value.length;
+                const countClass = remaining < 10 ? (remaining < 0 ? 'error' : 'warning') : '';
+                html += `<div class="char-count ${countClass}" id="count-${question.id}">${value.length}/${question.maxLength}</div>`;
+            }
+
+            return html;
+        }
+
+        function renderChoiceQuestion(question) {
+            const currentValue = answers[question.id];
+            const inputType = question.multiple ? 'checkbox' : 'radio';
+            const inputName = `choice-${question.id}`;
+
+            let html = `<div class="choice-options">`;
+
+            for (const option of question.options || []) {
+                const isSelected = question.multiple
+                    ? (Array.isArray(currentValue) && currentValue.includes(option.value))
+                    : currentValue === option.value;
+                const selectedClass = isSelected ? 'selected' : '';
+                const checked = isSelected ? 'checked' : '';
+
+                html += `
+                    <div class="choice-option ${selectedClass}" onclick="handleChoiceClick('${question.id}', '${option.value}', ${question.multiple || false})">
+                        <input
+                            type="${inputType}"
+                            name="${inputName}"
+                            id="option-${question.id}-${option.value}"
+                            value="${escapeHtml(option.value)}"
+                            ${checked}
+                        />
+                        <label for="option-${question.id}-${option.value}">${escapeHtml(option.label)}</label>
+                    </div>
+                `;
+            }
+
+            html += `</div>`;
+            return html;
+        }
+
+        function handleTextChange(questionId, value) {
+            if (value.trim()) {
+                answers[questionId] = value;
+            } else {
+                delete answers[questionId];
+            }
+            updateVisibility();
+            updateAnswersJson();
+        }
+
+        function handleTextInput(questionId, input) {
+            const question = questionnaire.questions.find(q => q.id === questionId);
+            if (question && question.maxLength) {
+                const countEl = document.getElementById(`count-${questionId}`);
+                if (countEl) {
+                    const remaining = question.maxLength - input.value.length;
+                    countEl.textContent = `${input.value.length}/${question.maxLength}`;
+                    countEl.className = 'char-count ' + (remaining < 10 ? (remaining < 0 ? 'error' : 'warning') : '');
+                }
+            }
+        }
+
+        function handleChoiceClick(questionId, value, isMultiple) {
+            if (isMultiple) {
+                if (!Array.isArray(answers[questionId])) {
+                    answers[questionId] = [];
+                }
+                const idx = answers[questionId].indexOf(value);
+                if (idx > -1) {
+                    answers[questionId].splice(idx, 1);
+                    if (answers[questionId].length === 0) {
+                        delete answers[questionId];
+                    }
+                } else {
+                    answers[questionId].push(value);
+                }
+            } else {
+                answers[questionId] = value;
+            }
+
+            // Update UI
+            const question = questionnaire.questions.find(q => q.id === questionId);
+            if (question) {
+                const container = document.querySelector(`[data-question-id="${questionId}"] .choice-options`);
+                if (container) {
+                    container.innerHTML = '';
+                    const inputType = isMultiple ? 'checkbox' : 'radio';
+                    const inputName = `choice-${questionId}`;
+
+                    for (const option of question.options || []) {
+                        const isSelected = isMultiple
+                            ? (Array.isArray(answers[questionId]) && answers[questionId].includes(option.value))
+                            : answers[questionId] === option.value;
+
+                        const optionEl = document.createElement('div');
+                        optionEl.className = `choice-option ${isSelected ? 'selected' : ''}`;
+                        optionEl.onclick = () => handleChoiceClick(questionId, option.value, isMultiple);
+                        optionEl.innerHTML = `
+                            <input
+                                type="${inputType}"
+                                name="${inputName}"
+                                id="option-${questionId}-${option.value}"
+                                value="${escapeHtml(option.value)}"
+                                ${isSelected ? 'checked' : ''}
+                            />
+                            <label for="option-${questionId}-${option.value}">${escapeHtml(option.label)}</label>
+                        `;
+                        container.appendChild(optionEl);
+                    }
+                }
+            }
+
+            updateVisibility();
+            updateAnswersJson();
+        }
+
+        function evaluateVisibility(question) {
+            if (!question.visibleIf) return true;
+
+            const { all, any } = question.visibleIf;
+
+            let allResult = true;
+            let anyResult = true;
+
+            if (all && all.length > 0) {
+                allResult = all.every(condition => evaluateCondition(condition));
+            }
+
+            if (any && any.length > 0) {
+                anyResult = any.some(condition => evaluateCondition(condition));
+            }
+
+            if (all && any) {
+                return allResult && anyResult;
+            } else if (all) {
+                return allResult;
+            } else if (any) {
+                return anyResult;
+            }
+
+            return true;
+        }
+
+        function evaluateCondition(condition) {
+            const { questionId, operator, value } = condition;
+            const answer = answers[questionId];
+
+            switch (operator) {
+                case 'equals':
+                    return answer === value;
+                case 'notEquals':
+                    return answer !== value;
+                case 'in':
+                    if (Array.isArray(answer)) {
+                        return Array.isArray(value)
+                            ? value.some(v => answer.includes(v))
+                            : answer.includes(value);
+                    }
+                    return Array.isArray(value) ? value.includes(answer) : answer === value;
+                case 'notIn':
+                    if (Array.isArray(answer)) {
+                        return Array.isArray(value)
+                            ? !value.some(v => answer.includes(v))
+                            : !answer.includes(value);
+                    }
+                    return Array.isArray(value) ? !value.includes(answer) : answer !== value;
+                case 'gt':
+                    return parseFloat(answer) > parseFloat(value);
+                case 'gte':
+                    return parseFloat(answer) >= parseFloat(value);
+                case 'lt':
+                    return parseFloat(answer) < parseFloat(value);
+                case 'lte':
+                    return parseFloat(answer) <= parseFloat(value);
+                case 'isAnswered':
+                    return answer !== undefined && answer !== null && answer !== '';
+                case 'notAnswered':
+                    return answer === undefined || answer === null || answer === '';
+                default:
+                    return true;
+            }
+        }
+
+        function updateVisibility() {
+            if (!questionnaire) return;
+
+            for (const question of questionnaire.questions || []) {
+                const el = document.querySelector(`[data-question-id="${question.id}"]`);
+                if (el) {
+                    const isVisible = evaluateVisibility(question);
+                    el.classList.toggle('hidden', !isVisible);
+                }
+            }
+        }
+
+        function updateAnswersJson() {
+            const el = document.getElementById('answersJson');
+            if (el) {
+                el.textContent = JSON.stringify(answers, null, 2);
+            }
+        }
+
+        function resetAnswers() {
+            answers = {};
+            renderQuestionnaire();
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function setupDivider() {
+            const divider = document.getElementById('divider');
+            const leftPanel = document.getElementById('leftPanel');
+            const rightPanel = document.getElementById('rightPanel');
+            let isResizing = false;
+
+            divider.addEventListener('mousedown', (e) => {
+                isResizing = true;
+                document.body.style.cursor = 'col-resize';
+                document.body.style.userSelect = 'none';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (!isResizing) return;
+
+                const containerWidth = document.querySelector('.container').offsetWidth;
+                const newLeftWidth = (e.clientX / containerWidth) * 100;
+
+                if (newLeftWidth > 20 && newLeftWidth < 80) {
+                    leftPanel.style.flex = `0 0 ${newLeftWidth}%`;
+                    rightPanel.style.flex = `0 0 ${100 - newLeftWidth - 0.5}%`;
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                isResizing = false;
+                document.body.style.cursor = '';
+                document.body.style.userSelect = '';
+            });
+        }
+    </script>
+</body>
+</html>
