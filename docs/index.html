@@ -97,7 +97,7 @@
         }
 
         .questionnaire-header {
-            margin-bottom: 32px;
+            margin-bottom: 24px;
         }
 
         .questionnaire-title {
@@ -112,12 +112,113 @@
             font-size: 16px;
         }
 
-        .section {
+        /* Progress Bar & Steps */
+        .wizard-progress {
             margin-bottom: 32px;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 8px;
+        }
+
+        .progress-steps::before {
+            content: '';
+            position: absolute;
+            top: 16px;
+            left: 24px;
+            right: 24px;
+            height: 3px;
+            background: #e0e0e0;
+            z-index: 0;
+        }
+
+        .progress-bar-fill {
+            position: absolute;
+            top: 16px;
+            left: 24px;
+            height: 3px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: 1;
+            transition: width 0.3s ease;
+        }
+
+        .step {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+            cursor: pointer;
+            flex: 1;
+        }
+
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            color: #999;
+            transition: all 0.3s ease;
+            margin-bottom: 8px;
+        }
+
+        .step.completed .step-circle {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-color: transparent;
+            color: #fff;
+        }
+
+        .step.active .step-circle {
+            border-color: #667eea;
+            color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.2);
+        }
+
+        .step-label {
+            font-size: 12px;
+            color: #999;
+            text-align: center;
+            max-width: 100px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            transition: color 0.3s ease;
+        }
+
+        .step.active .step-label,
+        .step.completed .step-label {
+            color: #333;
+            font-weight: 500;
+        }
+
+        .step:hover .step-circle {
+            transform: scale(1.1);
+        }
+
+        .step:hover .step-label {
+            color: #667eea;
+        }
+
+        /* Section Content */
+        .section {
             background: #fff;
             border-radius: 12px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.08);
             overflow: hidden;
+            display: none;
+        }
+
+        .section.active {
+            display: block;
         }
 
         .section-header {
@@ -139,6 +240,61 @@
 
         .section-questions {
             padding: 24px;
+        }
+
+        /* Navigation Buttons */
+        .wizard-nav {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid #eee;
+        }
+
+        .wizard-nav .btn {
+            padding: 12px 24px;
+            font-size: 14px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-outline {
+            background: #fff;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: #f0f0ff;
+        }
+
+        .btn-outline:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
         }
 
         .question {
@@ -397,6 +553,34 @@
             white-space: pre-wrap;
             word-break: break-all;
         }
+
+        /* Completion state */
+        .completion-state {
+            text-align: center;
+            padding: 60px 24px;
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+        }
+
+        .completion-state svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 20px;
+            color: #4caf50;
+        }
+
+        .completion-state h3 {
+            font-size: 24px;
+            margin-bottom: 8px;
+            color: #1a1a1a;
+        }
+
+        .completion-state p {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 24px;
+        }
     </style>
 </head>
 <body>
@@ -442,6 +626,7 @@
         // State
         let questionnaire = null;
         let answers = {};
+        let currentSectionIndex = 0;
 
         // DOM Elements
         const jsonInput = document.getElementById('json-input');
@@ -839,6 +1024,7 @@
             try {
                 questionnaire = JSON.parse(json);
                 answers = {};
+                currentSectionIndex = 0;
                 renderQuestionnaire();
             } catch (e) {
                 preview.innerHTML = `<div class="error-banner">Invalid JSON: ${e.message}</div>`;
@@ -848,6 +1034,8 @@
         function renderQuestionnaire() {
             if (!questionnaire) return;
 
+            const hasSections = questionnaire.sections && questionnaire.sections.length > 0;
+
             let html = `
                 <div class="questionnaire">
                     <div class="questionnaire-header">
@@ -856,13 +1044,10 @@
                     </div>
             `;
 
-            if (questionnaire.sections && questionnaire.sections.length > 0) {
-                // Render with sections
-                for (const section of questionnaire.sections) {
-                    html += renderSection(section);
-                }
+            if (hasSections) {
+                html += renderWizardProgress();
+                html += renderSections();
             } else {
-                // Render without sections
                 html += `<div class="no-sections">`;
                 for (const question of questionnaire.questions || []) {
                     html += renderQuestion(question);
@@ -886,25 +1071,33 @@
 
             preview.innerHTML = html;
             updateVisibility();
+            updateProgressBar();
         }
 
-        function renderSection(section) {
-            const questions = (section.questionIds || [])
-                .map(id => questionnaire.questions.find(q => q.id === id))
-                .filter(Boolean);
+        function renderWizardProgress() {
+            const sections = questionnaire.sections;
+            const totalSections = sections.length;
 
             let html = `
-                <div class="section">
-                    <div class="section-header">
-                        <h2 class="section-title">${escapeHtml(section.title)}</h2>
-                        ${section.description ? `<p class="section-description">${escapeHtml(section.description)}</p>` : ''}
-                    </div>
-                    <div class="section-questions">
+                <div class="wizard-progress">
+                    <div class="progress-steps">
+                        <div class="progress-bar-fill" id="progressBarFill"></div>
             `;
 
-            for (const question of questions) {
-                html += renderQuestion(question);
-            }
+            sections.forEach((section, index) => {
+                const isCompleted = index < currentSectionIndex;
+                const isActive = index === currentSectionIndex;
+                const statusClass = isCompleted ? 'completed' : (isActive ? 'active' : '');
+
+                html += `
+                    <div class="step ${statusClass}" onclick="goToSection(${index})" data-step="${index}">
+                        <div class="step-circle">
+                            ${isCompleted ? '&#10003;' : index + 1}
+                        </div>
+                        <span class="step-label">${escapeHtml(section.title)}</span>
+                    </div>
+                `;
+            });
 
             html += `
                     </div>
@@ -914,13 +1107,159 @@
             return html;
         }
 
+        function renderSections() {
+            let html = '<div id="sectionsContainer">';
+
+            questionnaire.sections.forEach((section, index) => {
+                const isActive = index === currentSectionIndex;
+                const questions = (section.questionIds || [])
+                    .map(id => questionnaire.questions.find(q => q.id === id))
+                    .filter(Boolean);
+
+                html += `
+                    <div class="section ${isActive ? 'active' : ''}" data-section="${index}">
+                        <div class="section-header">
+                            <h2 class="section-title">${escapeHtml(section.title)}</h2>
+                            ${section.description ? `<p class="section-description">${escapeHtml(section.description)}</p>` : ''}
+                        </div>
+                        <div class="section-questions">
+                `;
+
+                for (const question of questions) {
+                    html += renderQuestion(question);
+                }
+
+                html += renderWizardNav(index);
+
+                html += `
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            return html;
+        }
+
+        function renderWizardNav(sectionIndex) {
+            const totalSections = questionnaire.sections.length;
+            const isFirst = sectionIndex === 0;
+            const isLast = sectionIndex === totalSections - 1;
+
+            return `
+                <div class="wizard-nav">
+                    <button
+                        class="btn btn-outline"
+                        onclick="prevSection()"
+                        ${isFirst ? 'disabled' : ''}
+                    >
+                        &larr; Previous
+                    </button>
+                    <button
+                        class="btn btn-primary"
+                        onclick="${isLast ? 'completeQuestionnaire()' : 'nextSection()'}"
+                    >
+                        ${isLast ? 'Complete' : 'Next &rarr;'}
+                    </button>
+                </div>
+            `;
+        }
+
+        function goToSection(index) {
+            if (index >= 0 && index < questionnaire.sections.length) {
+                currentSectionIndex = index;
+                updateSectionDisplay();
+                updateProgressBar();
+            }
+        }
+
+        function prevSection() {
+            if (currentSectionIndex > 0) {
+                currentSectionIndex--;
+                updateSectionDisplay();
+                updateProgressBar();
+            }
+        }
+
+        function nextSection() {
+            if (currentSectionIndex < questionnaire.sections.length - 1) {
+                currentSectionIndex++;
+                updateSectionDisplay();
+                updateProgressBar();
+            }
+        }
+
+        function completeQuestionnaire() {
+            const container = document.getElementById('sectionsContainer');
+            if (container) {
+                container.innerHTML = `
+                    <div class="completion-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                            <polyline points="22,4 12,14.01 9,11.01"></polyline>
+                        </svg>
+                        <h3>Questionnaire Complete!</h3>
+                        <p>Thank you for completing all sections.</p>
+                        <button class="btn btn-primary" onclick="resetAnswers()">Start Over</button>
+                    </div>
+                `;
+            }
+            // Update all steps to completed
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.add('completed');
+                step.classList.remove('active');
+                step.querySelector('.step-circle').innerHTML = '&#10003;';
+            });
+            updateProgressBar(true);
+        }
+
+        function updateSectionDisplay() {
+            document.querySelectorAll('.section').forEach((section, index) => {
+                section.classList.toggle('active', index === currentSectionIndex);
+            });
+
+            document.querySelectorAll('.step').forEach((step, index) => {
+                const isCompleted = index < currentSectionIndex;
+                const isActive = index === currentSectionIndex;
+
+                step.classList.toggle('completed', isCompleted);
+                step.classList.toggle('active', isActive);
+
+                const circle = step.querySelector('.step-circle');
+                circle.innerHTML = isCompleted ? '&#10003;' : (index + 1);
+            });
+
+            updateVisibility();
+        }
+
+        function updateProgressBar(complete = false) {
+            const progressFill = document.getElementById('progressBarFill');
+            if (!progressFill || !questionnaire.sections) return;
+
+            const totalSections = questionnaire.sections.length;
+            const stepsContainer = document.querySelector('.progress-steps');
+            if (!stepsContainer) return;
+
+            const containerWidth = stepsContainer.offsetWidth - 48; // subtract padding
+            let progress;
+
+            if (complete) {
+                progress = 100;
+            } else {
+                progress = totalSections > 1
+                    ? (currentSectionIndex / (totalSections - 1)) * 100
+                    : 0;
+            }
+
+            progressFill.style.width = `${progress}%`;
+        }
+
         function renderQuestion(question) {
             const isVisible = evaluateVisibility(question);
             const hiddenClass = isVisible ? '' : 'hidden';
 
             let html = `<div class="question ${hiddenClass}" data-question-id="${question.id}">`;
 
-            // Label
             html += `
                 <label class="question-label">
                     ${escapeHtml(question.label)}
@@ -928,12 +1267,10 @@
                 </label>
             `;
 
-            // Help text
             if (question.helpText) {
                 html += `<p class="help-text">${escapeHtml(question.helpText)}</p>`;
             }
 
-            // Input based on type
             if (question.type === 'text') {
                 html += renderTextQuestion(question);
             } else if (question.type === 'choice') {
@@ -1051,7 +1388,6 @@
                 answers[questionId] = value;
             }
 
-            // Update UI
             const question = questionnaire.questions.find(q => q.id === questionId);
             if (question) {
                 const container = document.querySelector(`[data-question-id="${questionId}"] .choice-options`);
@@ -1175,6 +1511,7 @@
 
         function resetAnswers() {
             answers = {};
+            currentSectionIndex = 0;
             renderQuestionnaire();
         }
 
