@@ -1,0 +1,516 @@
+{
+  "id": "insurance-application",
+  "title": "Comprehensive Insurance Application",
+  "description": "Apply for health and life insurance coverage",
+  "sections": [
+    {
+      "id": "personal-info",
+      "title": "Personal Information",
+      "description": "Tell us about yourself",
+      "questionIds": ["fullName", "dateOfBirth", "age", "gender", "maritalStatus"]
+    },
+    {
+      "id": "contact-details",
+      "title": "Contact Details",
+      "description": "How can we reach you?",
+      "questionIds": ["email", "phone", "address", "preferredContact"]
+    },
+    {
+      "id": "coverage-selection",
+      "title": "Coverage Selection",
+      "description": "Select the coverage you need",
+      "questionIds": ["coverageTypes", "healthInsurance", "lifeInsurance", "healthCoverageAmount", "lifeCoverageAmount"]
+    },
+    {
+      "id": "health-information",
+      "title": "Health Information",
+      "description": "Information about your health (only if health insurance selected)",
+      "questionIds": ["hasPreviousConditions", "previousConditions", "onMedication", "medicationDetails", "smoker", "exerciseFrequency"]
+    },
+    {
+      "id": "family-information",
+      "title": "Family Information",
+      "description": "Information about your family (only if married or has dependents)",
+      "questionIds": ["hasDependents", "numberOfDependents", "dependentsCoverage", "spouseEmployed", "spouseInsurance"]
+    },
+    {
+      "id": "financial-information",
+      "title": "Financial Information",
+      "description": "Help us determine your premium (only for high-value coverage)",
+      "questionIds": ["annualIncome", "employmentStatus", "occupation", "incomeVerification"]
+    },
+    {
+      "id": "beneficiary-information",
+      "title": "Beneficiary Information",
+      "description": "Who should receive benefits? (only for life insurance)",
+      "questionIds": ["beneficiaryName", "beneficiaryRelationship", "beneficiaryContact", "contingentBeneficiary"]
+    },
+    {
+      "id": "final-review",
+      "title": "Final Review",
+      "description": "Review and submit your application",
+      "questionIds": ["reviewConsent", "termsAccepted", "additionalComments"]
+    }
+  ],
+  "questions": [
+    {
+      "id": "fullName",
+      "type": "text",
+      "label": "Full Legal Name",
+      "required": true,
+      "maxLength": 100
+    },
+    {
+      "id": "dateOfBirth",
+      "type": "text",
+      "label": "Date of Birth (YYYY-MM-DD)",
+      "required": true
+    },
+    {
+      "id": "age",
+      "type": "text",
+      "label": "Age",
+      "required": true
+    },
+    {
+      "id": "gender",
+      "type": "choice",
+      "label": "Gender",
+      "required": true,
+      "options": [
+        { "value": "male", "label": "Male" },
+        { "value": "female", "label": "Female" },
+        { "value": "other", "label": "Other" },
+        { "value": "prefer-not-to-say", "label": "Prefer not to say" }
+      ]
+    },
+    {
+      "id": "maritalStatus",
+      "type": "choice",
+      "label": "Marital Status",
+      "required": true,
+      "options": [
+        { "value": "single", "label": "Single" },
+        { "value": "married", "label": "Married" },
+        { "value": "divorced", "label": "Divorced" },
+        { "value": "widowed", "label": "Widowed" }
+      ]
+    },
+    {
+      "id": "email",
+      "type": "text",
+      "label": "Email Address",
+      "required": true
+    },
+    {
+      "id": "phone",
+      "type": "text",
+      "label": "Phone Number",
+      "required": true
+    },
+    {
+      "id": "address",
+      "type": "text",
+      "label": "Home Address",
+      "required": true,
+      "multiline": true
+    },
+    {
+      "id": "preferredContact",
+      "type": "choice",
+      "label": "Preferred Contact Method",
+      "required": true,
+      "options": [
+        { "value": "email", "label": "Email" },
+        { "value": "phone", "label": "Phone" },
+        { "value": "both", "label": "Either" }
+      ]
+    },
+    {
+      "id": "coverageTypes",
+      "type": "multichoice",
+      "label": "What type of coverage are you applying for?",
+      "required": true,
+      "options": [
+        { "value": "health", "label": "Health Insurance" },
+        { "value": "life", "label": "Life Insurance" }
+      ]
+    },
+    {
+      "id": "healthInsurance",
+      "type": "choice",
+      "label": "Confirm Health Insurance Application",
+      "required": true,
+      "options": [
+        { "value": "yes", "label": "Yes, apply for health insurance" }
+      ],
+      "visibleIf": {
+        "all": [
+          { "questionId": "coverageTypes", "operator": "in", "value": ["health"] }
+        ]
+      }
+    },
+    {
+      "id": "lifeInsurance",
+      "type": "choice",
+      "label": "Confirm Life Insurance Application",
+      "required": true,
+      "options": [
+        { "value": "yes", "label": "Yes, apply for life insurance" }
+      ],
+      "visibleIf": {
+        "all": [
+          { "questionId": "coverageTypes", "operator": "in", "value": ["life"] }
+        ]
+      }
+    },
+    {
+      "id": "healthCoverageAmount",
+      "type": "choice",
+      "label": "Health Coverage Amount (Annual Maximum)",
+      "required": true,
+      "options": [
+        { "value": "50000", "label": "$50,000" },
+        { "value": "100000", "label": "$100,000" },
+        { "value": "250000", "label": "$250,000" },
+        { "value": "500000", "label": "$500,000" },
+        { "value": "unlimited", "label": "Unlimited" }
+      ],
+      "visibleIf": {
+        "all": [
+          { "questionId": "coverageTypes", "operator": "in", "value": ["health"] }
+        ]
+      }
+    },
+    {
+      "id": "lifeCoverageAmount",
+      "type": "choice",
+      "label": "Life Insurance Coverage Amount",
+      "required": true,
+      "options": [
+        { "value": "100000", "label": "$100,000" },
+        { "value": "250000", "label": "$250,000" },
+        { "value": "500000", "label": "$500,000" },
+        { "value": "1000000", "label": "$1,000,000" },
+        { "value": "2000000", "label": "$2,000,000+" }
+      ],
+      "visibleIf": {
+        "all": [
+          { "questionId": "coverageTypes", "operator": "in", "value": ["life"] }
+        ]
+      }
+    },
+    {
+      "id": "hasPreviousConditions",
+      "type": "choice",
+      "label": "Do you have any pre-existing medical conditions?",
+      "required": true,
+      "options": [
+        { "value": "yes", "label": "Yes" },
+        { "value": "no", "label": "No" }
+      ],
+      "visibleIf": {
+        "all": [
+          { "questionId": "coverageTypes", "operator": "in", "value": ["health"] }
+        ]
+      }
+    },
+    {
+      "id": "previousConditions",
+      "type": "text",
+      "label": "Please describe your pre-existing conditions",
+      "required": true,
+      "multiline": true,
+      "visibleIf": {
+        "all": [
+          { "questionId": "coverageTypes", "operator": "in", "value": ["health"] },
+          { "questionId": "hasPreviousConditions", "operator": "equals", "value": "yes" }
+        ]
+      }
+    },
+    {
+      "id": "onMedication",
+      "type": "choice",
+      "label": "Are you currently taking any medication?",
+      "required": true,
+      "options": [
+        { "value": "yes", "label": "Yes" },
+        { "value": "no", "label": "No" }
+      ],
+      "visibleIf": {
+        "all": [
+          { "questionId": "coverageTypes", "operator": "in", "value": ["health"] }
+        ]
+      }
+    },
+    {
+      "id": "medicationDetails",
+      "type": "text",
+      "label": "Please list your current medications",
+      "required": true,
+      "multiline": true,
+      "visibleIf": {
+        "all": [
+          { "questionId": "coverageTypes", "operator": "in", "value": ["health"] },
+          { "questionId": "onMedication", "operator": "equals", "value": "yes" }
+        ]
+      }
+    },
+    {
+      "id": "smoker",
+      "type": "choice",
+      "label": "Do you smoke or use tobacco products?",
+      "required": true,
+      "options": [
+        { "value": "yes", "label": "Yes" },
+        { "value": "no", "label": "No" },
+        { "value": "former", "label": "Former smoker (quit 2+ years ago)" }
+      ],
+      "visibleIf": {
+        "any": [
+          { "questionId": "coverageTypes", "operator": "in", "value": ["health"] },
+          { "questionId": "coverageTypes", "operator": "in", "value": ["life"] }
+        ]
+      }
+    },
+    {
+      "id": "exerciseFrequency",
+      "type": "choice",
+      "label": "How often do you exercise?",
+      "required": true,
+      "options": [
+        { "value": "daily", "label": "Daily" },
+        { "value": "3-5-week", "label": "3-5 times per week" },
+        { "value": "1-2-week", "label": "1-2 times per week" },
+        { "value": "rarely", "label": "Rarely" },
+        { "value": "never", "label": "Never" }
+      ],
+      "visibleIf": {
+        "all": [
+          { "questionId": "coverageTypes", "operator": "in", "value": ["health"] }
+        ]
+      }
+    },
+    {
+      "id": "hasDependents",
+      "type": "choice",
+      "label": "Do you have dependents?",
+      "required": true,
+      "options": [
+        { "value": "yes", "label": "Yes" },
+        { "value": "no", "label": "No" }
+      ],
+      "visibleIf": {
+        "any": [
+          { "questionId": "maritalStatus", "operator": "equals", "value": "married" },
+          { "questionId": "coverageTypes", "operator": "in", "value": ["life"] }
+        ]
+      }
+    },
+    {
+      "id": "numberOfDependents",
+      "type": "text",
+      "label": "Number of Dependents",
+      "required": true,
+      "visibleIf": {
+        "all": [
+          { "questionId": "hasDependents", "operator": "equals", "value": "yes" }
+        ]
+      }
+    },
+    {
+      "id": "dependentsCoverage",
+      "type": "choice",
+      "label": "Would you like to include dependents in your coverage?",
+      "required": true,
+      "options": [
+        { "value": "yes", "label": "Yes" },
+        { "value": "no", "label": "No" }
+      ],
+      "visibleIf": {
+        "all": [
+          { "questionId": "hasDependents", "operator": "equals", "value": "yes" },
+          { "questionId": "coverageTypes", "operator": "in", "value": ["health"] }
+        ]
+      }
+    },
+    {
+      "id": "spouseEmployed",
+      "type": "choice",
+      "label": "Is your spouse employed?",
+      "required": true,
+      "options": [
+        { "value": "yes", "label": "Yes" },
+        { "value": "no", "label": "No" }
+      ],
+      "visibleIf": {
+        "all": [
+          { "questionId": "maritalStatus", "operator": "equals", "value": "married" }
+        ]
+      }
+    },
+    {
+      "id": "spouseInsurance",
+      "type": "choice",
+      "label": "Does your spouse have insurance through their employer?",
+      "required": true,
+      "options": [
+        { "value": "yes", "label": "Yes" },
+        { "value": "no", "label": "No" },
+        { "value": "unknown", "label": "I don't know" }
+      ],
+      "visibleIf": {
+        "all": [
+          { "questionId": "maritalStatus", "operator": "equals", "value": "married" },
+          { "questionId": "spouseEmployed", "operator": "equals", "value": "yes" }
+        ]
+      }
+    },
+    {
+      "id": "annualIncome",
+      "type": "choice",
+      "label": "Annual Household Income",
+      "required": true,
+      "options": [
+        { "value": "0-50k", "label": "Under $50,000" },
+        { "value": "50k-100k", "label": "$50,000 - $100,000" },
+        { "value": "100k-200k", "label": "$100,000 - $200,000" },
+        { "value": "200k-500k", "label": "$200,000 - $500,000" },
+        { "value": "500k+", "label": "Over $500,000" }
+      ],
+      "visibleIf": {
+        "any": [
+          { "questionId": "lifeCoverageAmount", "operator": "in", "value": ["1000000", "2000000"] },
+          { "questionId": "healthCoverageAmount", "operator": "in", "value": ["500000", "unlimited"] }
+        ]
+      }
+    },
+    {
+      "id": "employmentStatus",
+      "type": "choice",
+      "label": "Employment Status",
+      "required": true,
+      "options": [
+        { "value": "employed", "label": "Employed Full-time" },
+        { "value": "part-time", "label": "Employed Part-time" },
+        { "value": "self-employed", "label": "Self-employed" },
+        { "value": "unemployed", "label": "Unemployed" },
+        { "value": "retired", "label": "Retired" }
+      ],
+      "visibleIf": {
+        "any": [
+          { "questionId": "lifeCoverageAmount", "operator": "in", "value": ["1000000", "2000000"] },
+          { "questionId": "healthCoverageAmount", "operator": "in", "value": ["500000", "unlimited"] }
+        ]
+      }
+    },
+    {
+      "id": "occupation",
+      "type": "text",
+      "label": "Occupation/Job Title",
+      "required": true,
+      "visibleIf": {
+        "all": [
+          { "questionId": "employmentStatus", "operator": "in", "value": ["employed", "part-time", "self-employed"] }
+        ],
+        "any": [
+          { "questionId": "lifeCoverageAmount", "operator": "in", "value": ["1000000", "2000000"] },
+          { "questionId": "healthCoverageAmount", "operator": "in", "value": ["500000", "unlimited"] }
+        ]
+      }
+    },
+    {
+      "id": "incomeVerification",
+      "type": "choice",
+      "label": "Can you provide income verification documents?",
+      "required": true,
+      "options": [
+        { "value": "yes", "label": "Yes" },
+        { "value": "no", "label": "No" }
+      ],
+      "visibleIf": {
+        "all": [
+          { "questionId": "annualIncome", "operator": "in", "value": ["200k-500k", "500k+"] }
+        ]
+      }
+    },
+    {
+      "id": "beneficiaryName",
+      "type": "text",
+      "label": "Primary Beneficiary Full Name",
+      "required": true,
+      "visibleIf": {
+        "all": [
+          { "questionId": "coverageTypes", "operator": "in", "value": ["life"] }
+        ]
+      }
+    },
+    {
+      "id": "beneficiaryRelationship",
+      "type": "choice",
+      "label": "Relationship to Beneficiary",
+      "required": true,
+      "options": [
+        { "value": "spouse", "label": "Spouse" },
+        { "value": "child", "label": "Child" },
+        { "value": "parent", "label": "Parent" },
+        { "value": "sibling", "label": "Sibling" },
+        { "value": "other", "label": "Other" }
+      ],
+      "visibleIf": {
+        "all": [
+          { "questionId": "coverageTypes", "operator": "in", "value": ["life"] }
+        ]
+      }
+    },
+    {
+      "id": "beneficiaryContact",
+      "type": "text",
+      "label": "Beneficiary Contact Information",
+      "required": true,
+      "multiline": true,
+      "visibleIf": {
+        "all": [
+          { "questionId": "coverageTypes", "operator": "in", "value": ["life"] }
+        ]
+      }
+    },
+    {
+      "id": "contingentBeneficiary",
+      "type": "text",
+      "label": "Contingent Beneficiary (Optional)",
+      "required": false,
+      "visibleIf": {
+        "all": [
+          { "questionId": "coverageTypes", "operator": "in", "value": ["life"] },
+          { "questionId": "beneficiaryName", "operator": "isAnswered" }
+        ]
+      }
+    },
+    {
+      "id": "reviewConsent",
+      "type": "choice",
+      "label": "I have reviewed all information and confirm it is accurate",
+      "required": true,
+      "options": [
+        { "value": "yes", "label": "Yes, I confirm" }
+      ]
+    },
+    {
+      "id": "termsAccepted",
+      "type": "choice",
+      "label": "I accept the terms and conditions",
+      "required": true,
+      "options": [
+        { "value": "yes", "label": "Yes, I accept" }
+      ]
+    },
+    {
+      "id": "additionalComments",
+      "type": "text",
+      "label": "Additional Comments or Questions",
+      "required": false,
+      "multiline": true
+    }
+  ]
+}
