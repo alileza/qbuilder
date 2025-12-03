@@ -1414,16 +1414,16 @@
 
         function evaluateVisibility(question) {
             if (!question.visibleIf) return true;
-            const { all, any } = question.visibleIf;
-            let allResult = true, anyResult = true;
+            const { all = [], any = [] } = question.visibleIf;
 
-            if (all && all.length > 0) allResult = all.every(c => evaluateCondition(c));
-            if (any && any.length > 0) anyResult = any.some(c => evaluateCondition(c));
+            // Evaluate 'all' conditions (AND logic) - empty array = true
+            const allConditionsMet = all.length === 0 || all.every(c => evaluateCondition(c));
 
-            if (all && any) return allResult && anyResult;
-            if (all) return allResult;
-            if (any) return anyResult;
-            return true;
+            // Evaluate 'any' conditions (OR logic) - empty array = true
+            const anyConditionMet = any.length === 0 || any.some(c => evaluateCondition(c));
+
+            // Both must be true (matches qbuilder engine logic)
+            return allConditionsMet && anyConditionMet;
         }
 
         function evaluateCondition(condition) {
@@ -1431,21 +1431,42 @@
             const answer = answers[questionId];
 
             switch (operator) {
-                case 'equals': return answer === value;
-                case 'notEquals': return answer !== value;
+                case 'isAnswered':
+                    return answer !== undefined && answer !== null && answer !== '';
+                case 'notAnswered':
+                    return answer === undefined || answer === null || answer === '';
+                case 'equals':
+                    return answer === value;
+                case 'notEquals':
+                    return answer !== value;
                 case 'in':
-                    if (Array.isArray(answer)) return Array.isArray(value) ? value.some(v => answer.includes(v)) : answer.includes(value);
-                    return Array.isArray(value) ? value.includes(answer) : answer === value;
+                    if (!Array.isArray(value)) return false;
+                    if (Array.isArray(answer)) {
+                        // If answer is array, check if any element is in values
+                        return answer.some(item => value.includes(item));
+                    }
+                    return value.includes(answer);
                 case 'notIn':
-                    if (Array.isArray(answer)) return Array.isArray(value) ? !value.some(v => answer.includes(v)) : !answer.includes(value);
-                    return Array.isArray(value) ? !value.includes(answer) : answer !== value;
-                case 'gt': return parseFloat(answer) > parseFloat(value);
-                case 'gte': return parseFloat(answer) >= parseFloat(value);
-                case 'lt': return parseFloat(answer) < parseFloat(value);
-                case 'lte': return parseFloat(answer) <= parseFloat(value);
-                case 'isAnswered': return answer !== undefined && answer !== null && answer !== '';
-                case 'notAnswered': return answer === undefined || answer === null || answer === '';
-                default: return true;
+                    if (!Array.isArray(value)) return false;
+                    if (Array.isArray(answer)) {
+                        // If answer is array, check if no element is in values
+                        return !answer.some(item => value.includes(item));
+                    }
+                    return !value.includes(answer);
+                case 'gt':
+                    if (typeof answer !== 'number') return false;
+                    return answer > Number(value);
+                case 'gte':
+                    if (typeof answer !== 'number') return false;
+                    return answer >= Number(value);
+                case 'lt':
+                    if (typeof answer !== 'number') return false;
+                    return answer < Number(value);
+                case 'lte':
+                    if (typeof answer !== 'number') return false;
+                    return answer <= Number(value);
+                default:
+                    return false;
             }
         }
 
