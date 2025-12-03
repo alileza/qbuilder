@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QBuilder Questionnaire Visualizer</title>
+    <title>QBuilder - Questionnaire Designer</title>
     <style>
         * {
             box-sizing: border-box;
@@ -31,7 +31,7 @@
         }
 
         .panel-header {
-            padding: 16px 20px;
+            padding: 12px 16px;
             background: #fff;
             border-bottom: 1px solid #e0e0e0;
             font-weight: 600;
@@ -40,6 +40,19 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
+            gap: 8px;
+        }
+
+        .panel-header-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .panel-header-actions {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
         }
 
         .panel-content {
@@ -75,6 +88,7 @@
             resize: none;
             outline: none;
             line-height: 1.5;
+            tab-size: 2;
         }
 
         .right-panel {
@@ -421,29 +435,65 @@
         }
 
         .btn {
-            padding: 8px 16px;
+            padding: 6px 12px;
             border: none;
             border-radius: 6px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn svg {
+            width: 14px;
+            height: 14px;
         }
 
         .btn-secondary {
+            background: #3c3c3c;
+            color: #ccc;
+        }
+
+        .btn-secondary:hover {
+            background: #4a4a4a;
+            color: #fff;
+        }
+
+        .btn-success {
+            background: #4caf50;
+            color: #fff;
+        }
+
+        .btn-success:hover {
+            background: #43a047;
+        }
+
+        .btn-info {
+            background: #2196f3;
+            color: #fff;
+        }
+
+        .btn-info:hover {
+            background: #1e88e5;
+        }
+
+        .right-panel .btn-secondary {
             background: #f0f0f0;
             color: #333;
         }
 
-        .btn-secondary:hover {
+        .right-panel .btn-secondary:hover {
             background: #e0e0e0;
         }
 
-        .examples-dropdown {
+        .dropdown {
             position: relative;
         }
 
-        .examples-menu {
+        .dropdown-menu {
             display: none;
             position: absolute;
             top: 100%;
@@ -452,16 +502,16 @@
             border: 1px solid #e0e0e0;
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-            min-width: 200px;
+            min-width: 180px;
             z-index: 100;
             margin-top: 4px;
         }
 
-        .examples-menu.show {
+        .dropdown-menu.show {
             display: block;
         }
 
-        .examples-menu button {
+        .dropdown-menu button {
             width: 100%;
             padding: 10px 16px;
             border: none;
@@ -470,18 +520,27 @@
             cursor: pointer;
             font-size: 13px;
             color: #333;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
-        .examples-menu button:hover {
+        .dropdown-menu button:hover {
             background: #f5f5f5;
         }
 
-        .examples-menu button:first-child {
+        .dropdown-menu button:first-child {
             border-radius: 8px 8px 0 0;
         }
 
-        .examples-menu button:last-child {
+        .dropdown-menu button:last-child {
             border-radius: 0 0 8px 8px;
+        }
+
+        .dropdown-menu svg {
+            width: 16px;
+            height: 16px;
+            opacity: 0.6;
         }
 
         .divider {
@@ -516,6 +575,7 @@
 
         .empty-state p {
             font-size: 14px;
+            margin-bottom: 20px;
         }
 
         .answers-panel {
@@ -527,7 +587,7 @@
         }
 
         .answers-header {
-            padding: 16px 24px;
+            padding: 12px 16px;
             background: #f8f9fa;
             border-bottom: 1px solid #eee;
             font-weight: 600;
@@ -538,8 +598,13 @@
             align-items: center;
         }
 
+        .answers-header-actions {
+            display: flex;
+            gap: 6px;
+        }
+
         .answers-content {
-            padding: 16px 24px;
+            padding: 16px;
         }
 
         .answers-json {
@@ -552,6 +617,8 @@
             overflow-x: auto;
             white-space: pre-wrap;
             word-break: break-all;
+            max-height: 200px;
+            overflow-y: auto;
         }
 
         /* Completion state */
@@ -581,25 +648,148 @@
             color: #666;
             margin-bottom: 24px;
         }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #333;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 1000;
+            animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .toast.success {
+            background: #4caf50;
+        }
+
+        .toast.error {
+            background: #f44336;
+        }
+
+        .toast svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+            }
+            to {
+                opacity: 0;
+            }
+        }
+
+        /* Hidden file input */
+        #file-input {
+            display: none;
+        }
+
+        /* Status indicator */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: #999;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ccc;
+        }
+
+        .status-dot.valid {
+            background: #4caf50;
+        }
+
+        .status-dot.invalid {
+            background: #f44336;
+        }
+
+        .status-dot.empty {
+            background: #ff9800;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <div class="panel left-panel" id="leftPanel">
             <div class="panel-header">
-                <span>JSON Definition</span>
-                <div class="examples-dropdown">
-                    <button class="btn btn-secondary" onclick="toggleExamples()">Load Example</button>
-                    <div class="examples-menu" id="examplesMenu">
-                        <button onclick="loadExample('simple')">Simple Form</button>
-                        <button onclick="loadExample('conditional')">Conditional Logic</button>
-                        <button onclick="loadExample('sections')">With Sections</button>
-                        <button onclick="loadExample('full')">Full Featured</button>
+                <div class="panel-header-title">
+                    <span>Questionnaire JSON</span>
+                    <div class="status-indicator">
+                        <span class="status-dot" id="statusDot"></span>
+                        <span id="statusText">Empty</span>
                     </div>
+                </div>
+                <div class="panel-header-actions">
+                    <input type="file" id="file-input" accept=".json" onchange="importFile(event)" />
+                    <button class="btn btn-secondary" onclick="document.getElementById('file-input').click()" title="Import JSON file">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+                        Import
+                    </button>
+                    <div class="dropdown">
+                        <button class="btn btn-secondary" onclick="toggleDropdown('examplesMenu')" title="Load example">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            Examples
+                        </button>
+                        <div class="dropdown-menu" id="examplesMenu">
+                            <button onclick="loadExample('simple')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+                                Simple Form
+                            </button>
+                            <button onclick="loadExample('conditional')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 3h5v5M4 20L21 3M21 16v5h-5M15 15l6 6M4 4l5 5"/></svg>
+                                Conditional Logic
+                            </button>
+                            <button onclick="loadExample('sections')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+                                With Sections
+                            </button>
+                            <button onclick="loadExample('full')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                                Full Featured
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn btn-secondary" onclick="formatJson()" title="Format JSON (Ctrl+Shift+F)">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="21" y1="10" x2="3" y2="10"/><line x1="21" y1="6" x2="3" y2="6"/><line x1="21" y1="14" x2="3" y2="14"/><line x1="21" y1="18" x2="3" y2="18"/></svg>
+                        Format
+                    </button>
+                    <button class="btn btn-secondary" onclick="copyJson()" title="Copy to clipboard">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                        Copy
+                    </button>
+                    <button class="btn btn-success" onclick="downloadJson()" title="Download JSON file">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                        Export
+                    </button>
                 </div>
             </div>
             <div class="panel-content">
-                <textarea id="json-input" placeholder="Paste your questionnaire JSON here..." spellcheck="false"></textarea>
+                <textarea id="json-input" placeholder="Paste your questionnaire JSON here, or use Import/Examples above..." spellcheck="false"></textarea>
             </div>
         </div>
 
@@ -608,7 +798,12 @@
         <div class="panel right-panel" id="rightPanel">
             <div class="panel-header">
                 <span>Form Preview</span>
-                <button class="btn btn-secondary" onclick="resetAnswers()">Reset Answers</button>
+                <div class="panel-header-actions">
+                    <button class="btn btn-secondary" onclick="resetAnswers()" title="Clear all answers">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>
+                        Reset
+                    </button>
+                </div>
             </div>
             <div class="panel-content" id="preview">
                 <div class="empty-state">
@@ -616,7 +811,10 @@
                         <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                     </svg>
                     <h3>No questionnaire loaded</h3>
-                    <p>Paste JSON in the left panel or load an example to get started</p>
+                    <p>Import a JSON file, paste JSON in the editor, or load an example to get started</p>
+                    <button class="btn btn-primary" onclick="loadExample('sections')" style="padding: 12px 24px; font-size: 14px;">
+                        Load Example Questionnaire
+                    </button>
                 </div>
             </div>
         </div>
@@ -631,7 +829,8 @@
         // DOM Elements
         const jsonInput = document.getElementById('json-input');
         const preview = document.getElementById('preview');
-        const examplesMenu = document.getElementById('examplesMenu');
+        const statusDot = document.getElementById('statusDot');
+        const statusText = document.getElementById('statusText');
 
         // Example questionnaires
         const examples = {
@@ -640,38 +839,10 @@
                 title: "Simple Contact Form",
                 description: "A basic form with text and choice questions",
                 questions: [
-                    {
-                        id: "name",
-                        type: "text",
-                        label: "Full Name",
-                        required: true,
-                        helpText: "Enter your first and last name"
-                    },
-                    {
-                        id: "email",
-                        type: "text",
-                        label: "Email Address",
-                        required: true,
-                        maxLength: 100
-                    },
-                    {
-                        id: "message",
-                        type: "text",
-                        label: "Message",
-                        multiline: true,
-                        maxLength: 500,
-                        helpText: "Tell us what's on your mind"
-                    },
-                    {
-                        id: "priority",
-                        type: "choice",
-                        label: "Priority Level",
-                        options: [
-                            { value: "low", label: "Low" },
-                            { value: "medium", label: "Medium" },
-                            { value: "high", label: "High" }
-                        ]
-                    }
+                    { id: "name", type: "text", label: "Full Name", required: true, helpText: "Enter your first and last name" },
+                    { id: "email", type: "text", label: "Email Address", required: true, maxLength: 100 },
+                    { id: "message", type: "text", label: "Message", multiline: true, maxLength: 500, helpText: "Tell us what's on your mind" },
+                    { id: "priority", type: "choice", label: "Priority Level", options: [{ value: "low", label: "Low" }, { value: "medium", label: "Medium" }, { value: "high", label: "High" }] }
                 ]
             },
             conditional: {
@@ -679,78 +850,12 @@
                 title: "Conditional Logic Demo",
                 description: "Demonstrates how questions appear/hide based on answers",
                 questions: [
-                    {
-                        id: "hasAccount",
-                        type: "choice",
-                        label: "Do you have an existing account?",
-                        required: true,
-                        options: [
-                            { value: "yes", label: "Yes, I have an account" },
-                            { value: "no", label: "No, I'm new here" }
-                        ]
-                    },
-                    {
-                        id: "accountId",
-                        type: "text",
-                        label: "Account ID",
-                        helpText: "Enter your existing account ID",
-                        visibleIf: {
-                            all: [{ questionId: "hasAccount", operator: "equals", value: "yes" }]
-                        }
-                    },
-                    {
-                        id: "howHeard",
-                        type: "choice",
-                        label: "How did you hear about us?",
-                        visibleIf: {
-                            all: [{ questionId: "hasAccount", operator: "equals", value: "no" }]
-                        },
-                        options: [
-                            { value: "search", label: "Search Engine" },
-                            { value: "social", label: "Social Media" },
-                            { value: "friend", label: "Friend/Colleague" },
-                            { value: "other", label: "Other" }
-                        ]
-                    },
-                    {
-                        id: "otherSource",
-                        type: "text",
-                        label: "Please specify",
-                        visibleIf: {
-                            all: [
-                                { questionId: "hasAccount", operator: "equals", value: "no" },
-                                { questionId: "howHeard", operator: "equals", value: "other" }
-                            ]
-                        }
-                    },
-                    {
-                        id: "interests",
-                        type: "choice",
-                        label: "What are you interested in?",
-                        multiple: true,
-                        helpText: "Select all that apply",
-                        options: [
-                            { value: "product", label: "Product Updates" },
-                            { value: "blog", label: "Blog Posts" },
-                            { value: "events", label: "Events & Webinars" },
-                            { value: "newsletter", label: "Newsletter" }
-                        ]
-                    },
-                    {
-                        id: "eventPreference",
-                        type: "choice",
-                        label: "Preferred event format",
-                        visibleIf: {
-                            any: [
-                                { questionId: "interests", operator: "in", value: ["events"] }
-                            ]
-                        },
-                        options: [
-                            { value: "online", label: "Online/Virtual" },
-                            { value: "inperson", label: "In-Person" },
-                            { value: "both", label: "Both" }
-                        ]
-                    }
+                    { id: "hasAccount", type: "choice", label: "Do you have an existing account?", required: true, options: [{ value: "yes", label: "Yes, I have an account" }, { value: "no", label: "No, I'm new here" }] },
+                    { id: "accountId", type: "text", label: "Account ID", helpText: "Enter your existing account ID", visibleIf: { all: [{ questionId: "hasAccount", operator: "equals", value: "yes" }] } },
+                    { id: "howHeard", type: "choice", label: "How did you hear about us?", visibleIf: { all: [{ questionId: "hasAccount", operator: "equals", value: "no" }] }, options: [{ value: "search", label: "Search Engine" }, { value: "social", label: "Social Media" }, { value: "friend", label: "Friend/Colleague" }, { value: "other", label: "Other" }] },
+                    { id: "otherSource", type: "text", label: "Please specify", visibleIf: { all: [{ questionId: "hasAccount", operator: "equals", value: "no" }, { questionId: "howHeard", operator: "equals", value: "other" }] } },
+                    { id: "interests", type: "choice", label: "What are you interested in?", multiple: true, helpText: "Select all that apply", options: [{ value: "product", label: "Product Updates" }, { value: "blog", label: "Blog Posts" }, { value: "events", label: "Events & Webinars" }, { value: "newsletter", label: "Newsletter" }] },
+                    { id: "eventPreference", type: "choice", label: "Preferred event format", visibleIf: { any: [{ questionId: "interests", operator: "in", value: ["events"] }] }, options: [{ value: "online", label: "Online/Virtual" }, { value: "inperson", label: "In-Person" }, { value: "both", label: "Both" }] }
                 ]
             },
             sections: {
@@ -758,74 +863,19 @@
                 title: "Employee Onboarding",
                 description: "A form organized into logical sections",
                 sections: [
-                    {
-                        id: "personal",
-                        title: "Personal Information",
-                        description: "Basic information about you",
-                        questionIds: ["fullName", "email", "phone"]
-                    },
-                    {
-                        id: "employment",
-                        title: "Employment Details",
-                        description: "Information about your role",
-                        questionIds: ["department", "startDate", "workType"]
-                    },
-                    {
-                        id: "preferences",
-                        title: "Preferences",
-                        description: "Help us set up your workspace",
-                        questionIds: ["equipment", "dietaryRestrictions"]
-                    }
+                    { id: "personal", title: "Personal Information", description: "Basic information about you", questionIds: ["fullName", "email", "phone"] },
+                    { id: "employment", title: "Employment Details", description: "Information about your role", questionIds: ["department", "startDate", "workType"] },
+                    { id: "preferences", title: "Preferences", description: "Help us set up your workspace", questionIds: ["equipment", "dietaryRestrictions"] }
                 ],
                 questions: [
                     { id: "fullName", type: "text", label: "Full Name", required: true },
                     { id: "email", type: "text", label: "Work Email", required: true },
                     { id: "phone", type: "text", label: "Phone Number" },
-                    {
-                        id: "department",
-                        type: "choice",
-                        label: "Department",
-                        required: true,
-                        options: [
-                            { value: "engineering", label: "Engineering" },
-                            { value: "design", label: "Design" },
-                            { value: "product", label: "Product" },
-                            { value: "marketing", label: "Marketing" },
-                            { value: "sales", label: "Sales" },
-                            { value: "hr", label: "Human Resources" }
-                        ]
-                    },
+                    { id: "department", type: "choice", label: "Department", required: true, options: [{ value: "engineering", label: "Engineering" }, { value: "design", label: "Design" }, { value: "product", label: "Product" }, { value: "marketing", label: "Marketing" }, { value: "sales", label: "Sales" }, { value: "hr", label: "Human Resources" }] },
                     { id: "startDate", type: "text", label: "Start Date", helpText: "Format: YYYY-MM-DD" },
-                    {
-                        id: "workType",
-                        type: "choice",
-                        label: "Work Arrangement",
-                        options: [
-                            { value: "office", label: "Office" },
-                            { value: "remote", label: "Remote" },
-                            { value: "hybrid", label: "Hybrid" }
-                        ]
-                    },
-                    {
-                        id: "equipment",
-                        type: "choice",
-                        label: "Equipment Needed",
-                        multiple: true,
-                        options: [
-                            { value: "laptop", label: "Laptop" },
-                            { value: "monitor", label: "External Monitor" },
-                            { value: "keyboard", label: "Keyboard" },
-                            { value: "mouse", label: "Mouse" },
-                            { value: "headset", label: "Headset" }
-                        ]
-                    },
-                    {
-                        id: "dietaryRestrictions",
-                        type: "text",
-                        label: "Dietary Restrictions",
-                        multiline: true,
-                        helpText: "For team lunches and events"
-                    }
+                    { id: "workType", type: "choice", label: "Work Arrangement", options: [{ value: "office", label: "Office" }, { value: "remote", label: "Remote" }, { value: "hybrid", label: "Hybrid" }] },
+                    { id: "equipment", type: "choice", label: "Equipment Needed", multiple: true, options: [{ value: "laptop", label: "Laptop" }, { value: "monitor", label: "External Monitor" }, { value: "keyboard", label: "Keyboard" }, { value: "mouse", label: "Mouse" }, { value: "headset", label: "Headset" }] },
+                    { id: "dietaryRestrictions", type: "text", label: "Dietary Restrictions", multiline: true, helpText: "For team lunches and events" }
                 ]
             },
             full: {
@@ -833,140 +883,23 @@
                 title: "Complete Feature Demo",
                 description: "Showcases all available question types and features",
                 sections: [
-                    {
-                        id: "basics",
-                        title: "Basic Questions",
-                        description: "Standard text and choice questions",
-                        questionIds: ["textSimple", "textMultiline", "textMaxLength", "choiceSingle", "choiceMultiple"]
-                    },
-                    {
-                        id: "conditions",
-                        title: "Conditional Questions",
-                        description: "Questions that appear based on previous answers",
-                        questionIds: ["trigger", "equalsDemo", "notEqualsDemo", "inDemo", "isAnsweredDemo", "numericValue", "gtDemo", "gteDemo"]
-                    }
+                    { id: "basics", title: "Basic Questions", description: "Standard text and choice questions", questionIds: ["textSimple", "textMultiline", "textMaxLength", "choiceSingle", "choiceMultiple"] },
+                    { id: "conditions", title: "Conditional Questions", description: "Questions that appear based on previous answers", questionIds: ["trigger", "equalsDemo", "notEqualsDemo", "inDemo", "isAnsweredDemo", "numericValue", "gtDemo", "gteDemo"] }
                 ],
                 questions: [
-                    {
-                        id: "textSimple",
-                        type: "text",
-                        label: "Simple Text Input",
-                        required: true,
-                        helpText: "A basic single-line text input"
-                    },
-                    {
-                        id: "textMultiline",
-                        type: "text",
-                        label: "Multiline Text",
-                        multiline: true,
-                        helpText: "A textarea for longer responses"
-                    },
-                    {
-                        id: "textMaxLength",
-                        type: "text",
-                        label: "Text with Max Length",
-                        maxLength: 50,
-                        helpText: "Limited to 50 characters"
-                    },
-                    {
-                        id: "choiceSingle",
-                        type: "choice",
-                        label: "Single Choice (Radio)",
-                        required: true,
-                        helpText: "Select one option",
-                        options: [
-                            { value: "a", label: "Option A" },
-                            { value: "b", label: "Option B" },
-                            { value: "c", label: "Option C" }
-                        ]
-                    },
-                    {
-                        id: "choiceMultiple",
-                        type: "choice",
-                        label: "Multiple Choice (Checkboxes)",
-                        multiple: true,
-                        helpText: "Select all that apply",
-                        options: [
-                            { value: "1", label: "Choice 1" },
-                            { value: "2", label: "Choice 2" },
-                            { value: "3", label: "Choice 3" },
-                            { value: "4", label: "Choice 4" }
-                        ]
-                    },
-                    {
-                        id: "trigger",
-                        type: "choice",
-                        label: "Condition Trigger",
-                        helpText: "Change this to see conditional questions",
-                        options: [
-                            { value: "show", label: "Show 'equals' question" },
-                            { value: "hide", label: "Show 'notEquals' question" },
-                            { value: "special", label: "Show 'in' question" }
-                        ]
-                    },
-                    {
-                        id: "equalsDemo",
-                        type: "text",
-                        label: "Equals Condition",
-                        helpText: "Visible when trigger equals 'show'",
-                        visibleIf: {
-                            all: [{ questionId: "trigger", operator: "equals", value: "show" }]
-                        }
-                    },
-                    {
-                        id: "notEqualsDemo",
-                        type: "text",
-                        label: "Not Equals Condition",
-                        helpText: "Visible when trigger does NOT equal 'show'",
-                        visibleIf: {
-                            all: [{ questionId: "trigger", operator: "notEquals", value: "show" }]
-                        }
-                    },
-                    {
-                        id: "inDemo",
-                        type: "text",
-                        label: "In Condition",
-                        helpText: "Visible when trigger is 'show' OR 'special'",
-                        visibleIf: {
-                            any: [
-                                { questionId: "trigger", operator: "equals", value: "show" },
-                                { questionId: "trigger", operator: "equals", value: "special" }
-                            ]
-                        }
-                    },
-                    {
-                        id: "isAnsweredDemo",
-                        type: "text",
-                        label: "Is Answered Condition",
-                        helpText: "Visible when trigger has any answer",
-                        visibleIf: {
-                            all: [{ questionId: "trigger", operator: "isAnswered" }]
-                        }
-                    },
-                    {
-                        id: "numericValue",
-                        type: "text",
-                        label: "Enter a number (for numeric conditions)",
-                        helpText: "Enter a number to test gt/gte conditions"
-                    },
-                    {
-                        id: "gtDemo",
-                        type: "text",
-                        label: "Greater Than Demo",
-                        helpText: "Visible when numeric value > 5",
-                        visibleIf: {
-                            all: [{ questionId: "numericValue", operator: "gt", value: 5 }]
-                        }
-                    },
-                    {
-                        id: "gteDemo",
-                        type: "text",
-                        label: "Greater Than or Equal Demo",
-                        helpText: "Visible when numeric value >= 10",
-                        visibleIf: {
-                            all: [{ questionId: "numericValue", operator: "gte", value: 10 }]
-                        }
-                    }
+                    { id: "textSimple", type: "text", label: "Simple Text Input", required: true, helpText: "A basic single-line text input" },
+                    { id: "textMultiline", type: "text", label: "Multiline Text", multiline: true, helpText: "A textarea for longer responses" },
+                    { id: "textMaxLength", type: "text", label: "Text with Max Length", maxLength: 50, helpText: "Limited to 50 characters" },
+                    { id: "choiceSingle", type: "choice", label: "Single Choice (Radio)", required: true, helpText: "Select one option", options: [{ value: "a", label: "Option A" }, { value: "b", label: "Option B" }, { value: "c", label: "Option C" }] },
+                    { id: "choiceMultiple", type: "choice", label: "Multiple Choice (Checkboxes)", multiple: true, helpText: "Select all that apply", options: [{ value: "1", label: "Choice 1" }, { value: "2", label: "Choice 2" }, { value: "3", label: "Choice 3" }, { value: "4", label: "Choice 4" }] },
+                    { id: "trigger", type: "choice", label: "Condition Trigger", helpText: "Change this to see conditional questions", options: [{ value: "show", label: "Show 'equals' question" }, { value: "hide", label: "Show 'notEquals' question" }, { value: "special", label: "Show 'in' question" }] },
+                    { id: "equalsDemo", type: "text", label: "Equals Condition", helpText: "Visible when trigger equals 'show'", visibleIf: { all: [{ questionId: "trigger", operator: "equals", value: "show" }] } },
+                    { id: "notEqualsDemo", type: "text", label: "Not Equals Condition", helpText: "Visible when trigger does NOT equal 'show'", visibleIf: { all: [{ questionId: "trigger", operator: "notEquals", value: "show" }] } },
+                    { id: "inDemo", type: "text", label: "In Condition", helpText: "Visible when trigger is 'show' OR 'special'", visibleIf: { any: [{ questionId: "trigger", operator: "equals", value: "show" }, { questionId: "trigger", operator: "equals", value: "special" }] } },
+                    { id: "isAnsweredDemo", type: "text", label: "Is Answered Condition", helpText: "Visible when trigger has any answer", visibleIf: { all: [{ questionId: "trigger", operator: "isAnswered" }] } },
+                    { id: "numericValue", type: "text", label: "Enter a number (for numeric conditions)", helpText: "Enter a number to test gt/gte conditions" },
+                    { id: "gtDemo", type: "text", label: "Greater Than Demo", helpText: "Visible when numeric value > 5", visibleIf: { all: [{ questionId: "numericValue", operator: "gt", value: 5 }] } },
+                    { id: "gteDemo", type: "text", label: "Greater Than or Equal Demo", helpText: "Visible when numeric value >= 10", visibleIf: { all: [{ questionId: "numericValue", operator: "gte", value: 10 }] } }
                 ]
             }
         };
@@ -974,15 +907,20 @@
         // Initialize
         jsonInput.addEventListener('input', debounce(parseAndRender, 300));
         document.addEventListener('click', (e) => {
-            if (!e.target.closest('.examples-dropdown')) {
-                examplesMenu.classList.remove('show');
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
             }
         });
-
-        // Setup resizable divider
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.shiftKey && e.key === 'F') {
+                e.preventDefault();
+                formatJson();
+            }
+        });
         setupDivider();
+        updateStatus();
 
-        // Functions
+        // Utility functions
         function debounce(fn, delay) {
             let timeout;
             return (...args) => {
@@ -991,8 +929,134 @@
             };
         }
 
-        function toggleExamples() {
-            examplesMenu.classList.toggle('show');
+        function showToast(message, type = 'success') {
+            const existing = document.querySelector('.toast');
+            if (existing) existing.remove();
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    ${type === 'success' ? '<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>' : '<circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/>'}
+                </svg>
+                ${message}
+            `;
+            document.body.appendChild(toast);
+            setTimeout(() => toast.remove(), 3000);
+        }
+
+        function toggleDropdown(id) {
+            const menu = document.getElementById(id);
+            document.querySelectorAll('.dropdown-menu').forEach(m => {
+                if (m.id !== id) m.classList.remove('show');
+            });
+            menu.classList.toggle('show');
+        }
+
+        function updateStatus() {
+            const json = jsonInput.value.trim();
+            if (!json) {
+                statusDot.className = 'status-dot empty';
+                statusText.textContent = 'Empty';
+            } else {
+                try {
+                    JSON.parse(json);
+                    statusDot.className = 'status-dot valid';
+                    statusText.textContent = 'Valid JSON';
+                } catch {
+                    statusDot.className = 'status-dot invalid';
+                    statusText.textContent = 'Invalid JSON';
+                }
+            }
+        }
+
+        // File operations
+        function importFile(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                jsonInput.value = e.target.result;
+                parseAndRender();
+                showToast(`Imported ${file.name}`);
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+
+        function copyJson() {
+            const json = jsonInput.value.trim();
+            if (!json) {
+                showToast('Nothing to copy', 'error');
+                return;
+            }
+            navigator.clipboard.writeText(json).then(() => {
+                showToast('Copied to clipboard');
+            }).catch(() => {
+                showToast('Failed to copy', 'error');
+            });
+        }
+
+        function downloadJson() {
+            const json = jsonInput.value.trim();
+            if (!json) {
+                showToast('Nothing to export', 'error');
+                return;
+            }
+
+            try {
+                const parsed = JSON.parse(json);
+                const formatted = JSON.stringify(parsed, null, 2);
+                const blob = new Blob([formatted], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${parsed.id || 'questionnaire'}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+                showToast(`Exported ${a.download}`);
+            } catch (e) {
+                showToast('Invalid JSON - cannot export', 'error');
+            }
+        }
+
+        function formatJson() {
+            const json = jsonInput.value.trim();
+            if (!json) return;
+
+            try {
+                const parsed = JSON.parse(json);
+                jsonInput.value = JSON.stringify(parsed, null, 2);
+                updateStatus();
+                showToast('JSON formatted');
+            } catch (e) {
+                showToast('Cannot format invalid JSON', 'error');
+            }
+        }
+
+        function copyAnswers() {
+            const json = JSON.stringify(answers, null, 2);
+            navigator.clipboard.writeText(json).then(() => {
+                showToast('Answers copied');
+            });
+        }
+
+        function downloadAnswers() {
+            if (Object.keys(answers).length === 0) {
+                showToast('No answers to export', 'error');
+                return;
+            }
+
+            const json = JSON.stringify(answers, null, 2);
+            const blob = new Blob([json], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${questionnaire?.id || 'questionnaire'}-answers.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast(`Exported answers`);
         }
 
         function loadExample(name) {
@@ -1001,10 +1065,11 @@
                 jsonInput.value = JSON.stringify(example, null, 2);
                 parseAndRender();
             }
-            examplesMenu.classList.remove('show');
+            document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.remove('show'));
         }
 
         function parseAndRender() {
+            updateStatus();
             const json = jsonInput.value.trim();
 
             if (!json) {
@@ -1014,7 +1079,10 @@
                             <path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
                         </svg>
                         <h3>No questionnaire loaded</h3>
-                        <p>Paste JSON in the left panel or load an example to get started</p>
+                        <p>Import a JSON file, paste JSON in the editor, or load an example to get started</p>
+                        <button class="btn btn-primary" onclick="loadExample('sections')" style="padding: 12px 24px; font-size: 14px;">
+                            Load Example Questionnaire
+                        </button>
                     </div>
                 `;
                 questionnaire = null;
@@ -1060,6 +1128,16 @@
                 <div class="answers-panel">
                     <div class="answers-header">
                         <span>Current Answers</span>
+                        <div class="answers-header-actions">
+                            <button class="btn btn-secondary" onclick="copyAnswers()" title="Copy answers">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                Copy
+                            </button>
+                            <button class="btn btn-secondary" onclick="downloadAnswers()" title="Download answers">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+                                Export
+                            </button>
+                        </div>
                     </div>
                     <div class="answers-content">
                         <pre class="answers-json" id="answersJson">${escapeHtml(JSON.stringify(answers, null, 2))}</pre>
@@ -1076,7 +1154,6 @@
 
         function renderWizardProgress() {
             const sections = questionnaire.sections;
-            const totalSections = sections.length;
 
             let html = `
                 <div class="wizard-progress">
@@ -1091,19 +1168,13 @@
 
                 html += `
                     <div class="step ${statusClass}" onclick="goToSection(${index})" data-step="${index}">
-                        <div class="step-circle">
-                            ${isCompleted ? '&#10003;' : index + 1}
-                        </div>
+                        <div class="step-circle">${isCompleted ? '&#10003;' : index + 1}</div>
                         <span class="step-label">${escapeHtml(section.title)}</span>
                     </div>
                 `;
             });
 
-            html += `
-                    </div>
-                </div>
-            `;
-
+            html += `</div></div>`;
             return html;
         }
 
@@ -1130,11 +1201,7 @@
                 }
 
                 html += renderWizardNav(index);
-
-                html += `
-                        </div>
-                    </div>
-                `;
+                html += `</div></div>`;
             });
 
             html += '</div>';
@@ -1148,19 +1215,8 @@
 
             return `
                 <div class="wizard-nav">
-                    <button
-                        class="btn btn-outline"
-                        onclick="prevSection()"
-                        ${isFirst ? 'disabled' : ''}
-                    >
-                        &larr; Previous
-                    </button>
-                    <button
-                        class="btn btn-primary"
-                        onclick="${isLast ? 'completeQuestionnaire()' : 'nextSection()'}"
-                    >
-                        ${isLast ? 'Complete' : 'Next &rarr;'}
-                    </button>
+                    <button class="btn btn-outline" onclick="prevSection()" ${isFirst ? 'disabled' : ''}>&larr; Previous</button>
+                    <button class="btn btn-primary" onclick="${isLast ? 'completeQuestionnaire()' : 'nextSection()'}">${isLast ? 'Complete' : 'Next &rarr;'}</button>
                 </div>
             `;
         }
@@ -1200,11 +1256,10 @@
                         </svg>
                         <h3>Questionnaire Complete!</h3>
                         <p>Thank you for completing all sections.</p>
-                        <button class="btn btn-primary" onclick="resetAnswers()">Start Over</button>
+                        <button class="btn btn-primary" onclick="resetAnswers()" style="padding: 12px 24px; font-size: 14px;">Start Over</button>
                     </div>
                 `;
             }
-            // Update all steps to completed
             document.querySelectorAll('.step').forEach(step => {
                 step.classList.add('completed');
                 step.classList.remove('active');
@@ -1221,12 +1276,9 @@
             document.querySelectorAll('.step').forEach((step, index) => {
                 const isCompleted = index < currentSectionIndex;
                 const isActive = index === currentSectionIndex;
-
                 step.classList.toggle('completed', isCompleted);
                 step.classList.toggle('active', isActive);
-
-                const circle = step.querySelector('.step-circle');
-                circle.innerHTML = isCompleted ? '&#10003;' : (index + 1);
+                step.querySelector('.step-circle').innerHTML = isCompleted ? '&#10003;' : (index + 1);
             });
 
             updateVisibility();
@@ -1237,20 +1289,7 @@
             if (!progressFill || !questionnaire.sections) return;
 
             const totalSections = questionnaire.sections.length;
-            const stepsContainer = document.querySelector('.progress-steps');
-            if (!stepsContainer) return;
-
-            const containerWidth = stepsContainer.offsetWidth - 48; // subtract padding
-            let progress;
-
-            if (complete) {
-                progress = 100;
-            } else {
-                progress = totalSections > 1
-                    ? (currentSectionIndex / (totalSections - 1)) * 100
-                    : 0;
-            }
-
+            let progress = complete ? 100 : (totalSections > 1 ? (currentSectionIndex / (totalSections - 1)) * 100 : 0);
             progressFill.style.width = `${progress}%`;
         }
 
@@ -1259,13 +1298,7 @@
             const hiddenClass = isVisible ? '' : 'hidden';
 
             let html = `<div class="question ${hiddenClass}" data-question-id="${question.id}">`;
-
-            html += `
-                <label class="question-label">
-                    ${escapeHtml(question.label)}
-                    ${question.required ? '<span class="required">*</span>' : ''}
-                </label>
-            `;
+            html += `<label class="question-label">${escapeHtml(question.label)}${question.required ? '<span class="required">*</span>' : ''}</label>`;
 
             if (question.helpText) {
                 html += `<p class="help-text">${escapeHtml(question.helpText)}</p>`;
@@ -1286,25 +1319,10 @@
             const maxLength = question.maxLength ? `maxlength="${question.maxLength}"` : '';
 
             let html = '';
-
             if (question.multiline) {
-                html += `<textarea
-                    id="input-${question.id}"
-                    ${maxLength}
-                    onchange="handleTextChange('${question.id}', this.value)"
-                    oninput="handleTextInput('${question.id}', this)"
-                    placeholder="Enter your answer..."
-                >${escapeHtml(value)}</textarea>`;
+                html += `<textarea id="input-${question.id}" ${maxLength} onchange="handleTextChange('${question.id}', this.value)" oninput="handleTextInput('${question.id}', this)" placeholder="Enter your answer...">${escapeHtml(value)}</textarea>`;
             } else {
-                html += `<input
-                    type="text"
-                    id="input-${question.id}"
-                    ${maxLength}
-                    value="${escapeHtml(value)}"
-                    onchange="handleTextChange('${question.id}', this.value)"
-                    oninput="handleTextInput('${question.id}', this)"
-                    placeholder="Enter your answer..."
-                />`;
+                html += `<input type="text" id="input-${question.id}" ${maxLength} value="${escapeHtml(value)}" onchange="handleTextChange('${question.id}', this.value)" oninput="handleTextInput('${question.id}', this)" placeholder="Enter your answer..." />`;
             }
 
             if (question.maxLength) {
@@ -1322,28 +1340,15 @@
             const inputName = `choice-${question.id}`;
 
             let html = `<div class="choice-options">`;
-
             for (const option of question.options || []) {
-                const isSelected = question.multiple
-                    ? (Array.isArray(currentValue) && currentValue.includes(option.value))
-                    : currentValue === option.value;
-                const selectedClass = isSelected ? 'selected' : '';
-                const checked = isSelected ? 'checked' : '';
-
+                const isSelected = question.multiple ? (Array.isArray(currentValue) && currentValue.includes(option.value)) : currentValue === option.value;
                 html += `
-                    <div class="choice-option ${selectedClass}" onclick="handleChoiceClick('${question.id}', '${option.value}', ${question.multiple || false})">
-                        <input
-                            type="${inputType}"
-                            name="${inputName}"
-                            id="option-${question.id}-${option.value}"
-                            value="${escapeHtml(option.value)}"
-                            ${checked}
-                        />
+                    <div class="choice-option ${isSelected ? 'selected' : ''}" onclick="handleChoiceClick('${question.id}', '${option.value}', ${question.multiple || false})">
+                        <input type="${inputType}" name="${inputName}" id="option-${question.id}-${option.value}" value="${escapeHtml(option.value)}" ${isSelected ? 'checked' : ''} />
                         <label for="option-${question.id}-${option.value}">${escapeHtml(option.label)}</label>
                     </div>
                 `;
             }
-
             html += `</div>`;
             return html;
         }
@@ -1372,15 +1377,11 @@
 
         function handleChoiceClick(questionId, value, isMultiple) {
             if (isMultiple) {
-                if (!Array.isArray(answers[questionId])) {
-                    answers[questionId] = [];
-                }
+                if (!Array.isArray(answers[questionId])) answers[questionId] = [];
                 const idx = answers[questionId].indexOf(value);
                 if (idx > -1) {
                     answers[questionId].splice(idx, 1);
-                    if (answers[questionId].length === 0) {
-                        delete answers[questionId];
-                    }
+                    if (answers[questionId].length === 0) delete answers[questionId];
                 } else {
                     answers[questionId].push(value);
                 }
@@ -1397,23 +1398,11 @@
                     const inputName = `choice-${questionId}`;
 
                     for (const option of question.options || []) {
-                        const isSelected = isMultiple
-                            ? (Array.isArray(answers[questionId]) && answers[questionId].includes(option.value))
-                            : answers[questionId] === option.value;
-
+                        const isSelected = isMultiple ? (Array.isArray(answers[questionId]) && answers[questionId].includes(option.value)) : answers[questionId] === option.value;
                         const optionEl = document.createElement('div');
                         optionEl.className = `choice-option ${isSelected ? 'selected' : ''}`;
                         optionEl.onclick = () => handleChoiceClick(questionId, option.value, isMultiple);
-                        optionEl.innerHTML = `
-                            <input
-                                type="${inputType}"
-                                name="${inputName}"
-                                id="option-${questionId}-${option.value}"
-                                value="${escapeHtml(option.value)}"
-                                ${isSelected ? 'checked' : ''}
-                            />
-                            <label for="option-${questionId}-${option.value}">${escapeHtml(option.label)}</label>
-                        `;
+                        optionEl.innerHTML = `<input type="${inputType}" name="${inputName}" id="option-${questionId}-${option.value}" value="${escapeHtml(option.value)}" ${isSelected ? 'checked' : ''} /><label for="option-${questionId}-${option.value}">${escapeHtml(option.label)}</label>`;
                         container.appendChild(optionEl);
                     }
                 }
@@ -1425,28 +1414,15 @@
 
         function evaluateVisibility(question) {
             if (!question.visibleIf) return true;
-
             const { all, any } = question.visibleIf;
+            let allResult = true, anyResult = true;
 
-            let allResult = true;
-            let anyResult = true;
+            if (all && all.length > 0) allResult = all.every(c => evaluateCondition(c));
+            if (any && any.length > 0) anyResult = any.some(c => evaluateCondition(c));
 
-            if (all && all.length > 0) {
-                allResult = all.every(condition => evaluateCondition(condition));
-            }
-
-            if (any && any.length > 0) {
-                anyResult = any.some(condition => evaluateCondition(condition));
-            }
-
-            if (all && any) {
-                return allResult && anyResult;
-            } else if (all) {
-                return allResult;
-            } else if (any) {
-                return anyResult;
-            }
-
+            if (all && any) return allResult && anyResult;
+            if (all) return allResult;
+            if (any) return anyResult;
             return true;
         }
 
@@ -1455,58 +1431,35 @@
             const answer = answers[questionId];
 
             switch (operator) {
-                case 'equals':
-                    return answer === value;
-                case 'notEquals':
-                    return answer !== value;
+                case 'equals': return answer === value;
+                case 'notEquals': return answer !== value;
                 case 'in':
-                    if (Array.isArray(answer)) {
-                        return Array.isArray(value)
-                            ? value.some(v => answer.includes(v))
-                            : answer.includes(value);
-                    }
+                    if (Array.isArray(answer)) return Array.isArray(value) ? value.some(v => answer.includes(v)) : answer.includes(value);
                     return Array.isArray(value) ? value.includes(answer) : answer === value;
                 case 'notIn':
-                    if (Array.isArray(answer)) {
-                        return Array.isArray(value)
-                            ? !value.some(v => answer.includes(v))
-                            : !answer.includes(value);
-                    }
+                    if (Array.isArray(answer)) return Array.isArray(value) ? !value.some(v => answer.includes(v)) : !answer.includes(value);
                     return Array.isArray(value) ? !value.includes(answer) : answer !== value;
-                case 'gt':
-                    return parseFloat(answer) > parseFloat(value);
-                case 'gte':
-                    return parseFloat(answer) >= parseFloat(value);
-                case 'lt':
-                    return parseFloat(answer) < parseFloat(value);
-                case 'lte':
-                    return parseFloat(answer) <= parseFloat(value);
-                case 'isAnswered':
-                    return answer !== undefined && answer !== null && answer !== '';
-                case 'notAnswered':
-                    return answer === undefined || answer === null || answer === '';
-                default:
-                    return true;
+                case 'gt': return parseFloat(answer) > parseFloat(value);
+                case 'gte': return parseFloat(answer) >= parseFloat(value);
+                case 'lt': return parseFloat(answer) < parseFloat(value);
+                case 'lte': return parseFloat(answer) <= parseFloat(value);
+                case 'isAnswered': return answer !== undefined && answer !== null && answer !== '';
+                case 'notAnswered': return answer === undefined || answer === null || answer === '';
+                default: return true;
             }
         }
 
         function updateVisibility() {
             if (!questionnaire) return;
-
             for (const question of questionnaire.questions || []) {
                 const el = document.querySelector(`[data-question-id="${question.id}"]`);
-                if (el) {
-                    const isVisible = evaluateVisibility(question);
-                    el.classList.toggle('hidden', !isVisible);
-                }
+                if (el) el.classList.toggle('hidden', !evaluateVisibility(question));
             }
         }
 
         function updateAnswersJson() {
             const el = document.getElementById('answersJson');
-            if (el) {
-                el.textContent = JSON.stringify(answers, null, 2);
-            }
+            if (el) el.textContent = JSON.stringify(answers, null, 2);
         }
 
         function resetAnswers() {
@@ -1517,12 +1470,7 @@
 
         function escapeHtml(str) {
             if (!str) return '';
-            return String(str)
-                .replace(/&/g, '&amp;')
-                .replace(/</g, '&lt;')
-                .replace(/>/g, '&gt;')
-                .replace(/"/g, '&quot;')
-                .replace(/'/g, '&#039;');
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
         }
 
         function setupDivider() {
@@ -1531,7 +1479,7 @@
             const rightPanel = document.getElementById('rightPanel');
             let isResizing = false;
 
-            divider.addEventListener('mousedown', (e) => {
+            divider.addEventListener('mousedown', () => {
                 isResizing = true;
                 document.body.style.cursor = 'col-resize';
                 document.body.style.userSelect = 'none';
@@ -1539,10 +1487,8 @@
 
             document.addEventListener('mousemove', (e) => {
                 if (!isResizing) return;
-
                 const containerWidth = document.querySelector('.container').offsetWidth;
                 const newLeftWidth = (e.clientX / containerWidth) * 100;
-
                 if (newLeftWidth > 20 && newLeftWidth < 80) {
                     leftPanel.style.flex = `0 0 ${newLeftWidth}%`;
                     rightPanel.style.flex = `0 0 ${100 - newLeftWidth - 0.5}%`;
