@@ -1178,14 +1178,57 @@
             return html;
         }
 
+        // Find questions that depend on a given question via visibleIf
+        function getDependentQuestions(questionId, allQuestions) {
+            return allQuestions.filter(q => {
+                if (!q.visibleIf) return false;
+                const { all = [], any = [] } = q.visibleIf;
+                const allConditions = [...all, ...any];
+                return allConditions.some(c => c.questionId === questionId);
+            });
+        }
+
+        // Get all questions for a section, including dependent questions not explicitly listed
+        function getSectionQuestions(section) {
+            const explicitIds = new Set(section.questionIds || []);
+            const explicitQuestions = (section.questionIds || [])
+                .map(id => questionnaire.questions.find(q => q.id === id))
+                .filter(Boolean);
+
+            // Find dependent questions for each explicit question
+            const dependentQuestions = [];
+            for (const q of explicitQuestions) {
+                const deps = getDependentQuestions(q.id, questionnaire.questions);
+                for (const dep of deps) {
+                    // Only add if not already in explicit list and not already added
+                    if (!explicitIds.has(dep.id) && !dependentQuestions.find(d => d.id === dep.id)) {
+                        dependentQuestions.push(dep);
+                    }
+                }
+            }
+
+            // Build final list: insert dependent questions after their parent
+            const result = [];
+            for (const q of explicitQuestions) {
+                result.push(q);
+                // Add any dependent questions right after
+                const deps = dependentQuestions.filter(dep => {
+                    const { all = [], any = [] } = dep.visibleIf || {};
+                    const allConditions = [...all, ...any];
+                    return allConditions.some(c => c.questionId === q.id);
+                });
+                result.push(...deps);
+            }
+
+            return result;
+        }
+
         function renderSections() {
             let html = '<div id="sectionsContainer">';
 
             questionnaire.sections.forEach((section, index) => {
                 const isActive = index === currentSectionIndex;
-                const questions = (section.questionIds || [])
-                    .map(id => questionnaire.questions.find(q => q.id === id))
-                    .filter(Boolean);
+                const questions = getSectionQuestions(section);
 
                 html += `
                     <div class="section ${isActive ? 'active' : ''}" data-section="${index}">
