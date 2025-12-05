@@ -31,6 +31,8 @@ describe('SubmissionRepository', () => {
             answers: sampleAnswers,
             metadata: {},
             created_at: now,
+            updated_at: null,
+            deleted_at: null,
           },
         ],
       });
@@ -45,6 +47,8 @@ describe('SubmissionRepository', () => {
         answers: sampleAnswers,
         metadata: {},
         createdAt: now,
+        updatedAt: null,
+        deletedAt: null,
       });
 
       expect(mockPool.query).toHaveBeenCalledWith(
@@ -124,6 +128,8 @@ describe('SubmissionRepository', () => {
             answers: sampleAnswers,
             metadata: { source: 'test' },
             created_at: now,
+            updated_at: null,
+            deleted_at: null,
           },
         ],
       });
@@ -138,10 +144,12 @@ describe('SubmissionRepository', () => {
         answers: sampleAnswers,
         metadata: { source: 'test' },
         createdAt: now,
+        updatedAt: null,
+        deletedAt: null,
       });
 
       expect(mockPool.query).toHaveBeenCalledWith(
-        expect.stringContaining('WHERE id = $1'),
+        expect.stringContaining('WHERE id = $1 AND deleted_at IS NULL'),
         [submissionId]
       );
     });
@@ -153,6 +161,19 @@ describe('SubmissionRepository', () => {
       const result = await repo.findById('nonexistent-id');
 
       expect(result).toBeNull();
+    });
+
+    it('should return null for soft-deleted submissions', async () => {
+      mockPool.query.mockResolvedValue({ rows: [] });
+
+      const repo = createSubmissionRepository(mockPool as any);
+      const result = await repo.findById('deleted-submission-id');
+
+      expect(result).toBeNull();
+      expect(mockPool.query).toHaveBeenCalledWith(
+        expect.stringContaining('deleted_at IS NULL'),
+        expect.any(Array)
+      );
     });
   });
 
@@ -406,6 +427,160 @@ describe('SubmissionRepository', () => {
       expect(mockPool.query).toHaveBeenNthCalledWith(
         2,
         expect.stringContaining('ORDER BY created_at DESC'),
+        expect.any(Array)
+      );
+    });
+
+    it('should exclude soft-deleted submissions', async () => {
+      mockPool.query
+        .mockResolvedValueOnce({
+          rows: [{ total: '2' }],
+        })
+        .mockResolvedValueOnce({
+          rows: [],
+        });
+
+      const repo = createSubmissionRepository(mockPool as any);
+      await repo.listByQuestionnaire('onboarding');
+
+      expect(mockPool.query).toHaveBeenNthCalledWith(
+        1,
+        expect.stringContaining('deleted_at IS NULL'),
+        expect.any(Array)
+      );
+    });
+  });
+
+  describe('update', () => {
+    it('should update submission answers', async () => {
+      const now = new Date();
+      const submissionId = '123e4567-e89b-12d3-a456-426614174000';
+      const updatedAnswers = { name: 'Jane Doe', age: '25' };
+
+      mockPool.query.mockResolvedValue({
+        rows: [
+          {
+            id: submissionId,
+            questionnaire_id: 'onboarding',
+            questionnaire_version: 1,
+            answers: updatedAnswers,
+            metadata: {},
+            created_at: now,
+            updated_at: now,
+            deleted_at: null,
+          },
+        ],
+      });
+
+      const repo = createSubmissionRepository(mockPool as any);
+      const result = await repo.update(submissionId, { answers: updatedAnswers });
+
+      expect(result.answers).toEqual(updatedAnswers);
+      expect(result.updatedAt).toEqual(now);
+      expect(mockPool.query).toHaveBeenCalledWith(
+        expect.stringContaining('UPDATE'),
+        expect.arrayContaining([JSON.stringify(updatedAnswers), submissionId])
+      );
+    });
+
+    it('should update submission metadata', async () => {
+      const now = new Date();
+      const submissionId = '123e4567-e89b-12d3-a456-426614174000';
+      const updatedMetadata = { source: 'updated', version: 2 };
+
+      mockPool.query.mockResolvedValue({
+        rows: [
+          {
+            id: submissionId,
+            questionnaire_id: 'onboarding',
+            questionnaire_version: 1,
+            answers: sampleAnswers,
+            metadata: updatedMetadata,
+            created_at: now,
+            updated_at: now,
+            deleted_at: null,
+          },
+        ],
+      });
+
+      const repo = createSubmissionRepository(mockPool as any);
+      const result = await repo.update(submissionId, { metadata: updatedMetadata });
+
+      expect(result.metadata).toEqual(updatedMetadata);
+      expect(mockPool.query).toHaveBeenCalledWith(
+        expect.stringContaining('metadata ='),
+        expect.arrayContaining([JSON.stringify(updatedMetadata), submissionId])
+      );
+    });
+
+    it('should throw NotFoundError if submission does not exist', async () => {
+      mockPool.query.mockResolvedValue({ rows: [] });
+
+      const repo = createSubmissionRepository(mockPool as any);
+
+      await expect(
+        repo.update('nonexistent-id', { answers: sampleAnswers })
+      ).rejects.toThrow(NotFoundError);
+      await expect(
+        repo.update('nonexistent-id', { answers: sampleAnswers })
+      ).rejects.toThrow('Submission "nonexistent-id" not found');
+    });
+
+    it('should not update soft-deleted submissions', async () => {
+      mockPool.query.mockResolvedValue({ rows: [] });
+
+      const repo = createSubmissionRepository(mockPool as any);
+
+      await expect(
+        repo.update('deleted-submission-id', { answers: sampleAnswers })
+      ).rejects.toThrow(NotFoundError);
+
+      expect(mockPool.query).toHaveBeenCalledWith(
+        expect.stringContaining('deleted_at IS NULL'),
+        expect.any(Array)
+      );
+    });
+  });
+
+  describe('softDelete', () => {
+    it('should soft delete a submission', async () => {
+      const submissionId = '123e4567-e89b-12d3-a456-426614174000';
+
+      mockPool.query.mockResolvedValue({ rowCount: 1 });
+
+      const repo = createSubmissionRepository(mockPool as any);
+      await repo.softDelete(submissionId);
+
+      expect(mockPool.query).toHaveBeenCalledWith(
+        expect.stringContaining('SET deleted_at = NOW()'),
+        [submissionId]
+      );
+    });
+
+    it('should throw NotFoundError if submission does not exist', async () => {
+      mockPool.query.mockResolvedValue({ rowCount: 0 });
+
+      const repo = createSubmissionRepository(mockPool as any);
+
+      await expect(
+        repo.softDelete('nonexistent-id')
+      ).rejects.toThrow(NotFoundError);
+      await expect(
+        repo.softDelete('nonexistent-id')
+      ).rejects.toThrow('Submission "nonexistent-id" not found');
+    });
+
+    it('should not delete already deleted submissions', async () => {
+      mockPool.query.mockResolvedValue({ rowCount: 0 });
+
+      const repo = createSubmissionRepository(mockPool as any);
+
+      await expect(
+        repo.softDelete('already-deleted-id')
+      ).rejects.toThrow(NotFoundError);
+
+      expect(mockPool.query).toHaveBeenCalledWith(
+        expect.stringContaining('deleted_at IS NULL'),
         expect.any(Array)
       );
     });

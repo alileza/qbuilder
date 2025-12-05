@@ -117,3 +117,63 @@ export async function handleListSubmissions(
     },
   };
 }
+
+/**
+ * Update a submission
+ */
+export async function handleUpdateSubmission(
+  questionnaireRepo: QuestionnaireRepository,
+  submissionRepo: SubmissionRepository,
+  submissionId: string,
+  body: { answers?: Record<string, unknown>; metadata?: Record<string, unknown> }
+): Promise<HandlerResult<{ submission: any }>> {
+  // First get the existing submission to validate answers against its questionnaire
+  const existingSubmission = await submissionRepo.findById(submissionId);
+  if (!existingSubmission) {
+    throw new NotFoundError(`Submission with id "${submissionId}" not found`);
+  }
+
+  // If answers are being updated, validate them
+  if (body.answers) {
+    const questionnaire = await questionnaireRepo.findByIdAndVersion(
+      existingSubmission.questionnaireId,
+      existingSubmission.questionnaireVersion
+    );
+
+    if (!questionnaire) {
+      throw new NotFoundError(
+        `Questionnaire "${existingSubmission.questionnaireId}" version ${existingSubmission.questionnaireVersion} not found`
+      );
+    }
+
+    const validationResult = validateAnswers(questionnaire, body.answers);
+    if (!validationResult.success) {
+      throw new ValidationError('Answer validation failed', validationResult.errors);
+    }
+  }
+
+  const submission = await submissionRepo.update(submissionId, {
+    answers: body.answers,
+    metadata: body.metadata,
+  });
+
+  return {
+    status: 200,
+    data: { submission },
+  };
+}
+
+/**
+ * Soft delete a submission
+ */
+export async function handleDeleteSubmission(
+  repo: SubmissionRepository,
+  submissionId: string
+): Promise<HandlerResult<{ message: string }>> {
+  await repo.softDelete(submissionId);
+
+  return {
+    status: 200,
+    data: { message: 'Submission deleted successfully' },
+  };
+}

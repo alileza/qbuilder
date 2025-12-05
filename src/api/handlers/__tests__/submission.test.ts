@@ -3,6 +3,8 @@ import {
   handleSubmitAnswers,
   handleGetSubmission,
   handleListSubmissions,
+  handleUpdateSubmission,
+  handleDeleteSubmission,
 } from '../submission.js';
 import type { QuestionnaireDefinition } from '../../../schemas/index.js';
 import { NotFoundError, ValidationError } from '../../../errors/index.js';
@@ -21,6 +23,8 @@ describe('Submission Handlers', () => {
     create: vi.fn(),
     findById: vi.fn(),
     listByQuestionnaire: vi.fn(),
+    update: vi.fn(),
+    softDelete: vi.fn(),
   };
 
   const sampleQuestionnaire: QuestionnaireDefinition = {
@@ -460,6 +464,162 @@ describe('Submission Handlers', () => {
       expect(response.status).toBe(200);
       expect(response.data.submissions).toEqual([]);
       expect(response.data.total).toBe(0);
+    });
+  });
+
+  describe('handleUpdateSubmission', () => {
+    it('should update submission answers and return 200', async () => {
+      const now = new Date();
+      const questionnaire = { ...sampleQuestionnaire, version: 1, createdAt: now, metadata: {} };
+      const existingSubmission = {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        questionnaireId: 'onboarding',
+        questionnaireVersion: 1,
+        answers: { name: 'John Doe', department: 'eng' },
+        metadata: {},
+        createdAt: now,
+        updatedAt: null,
+        deletedAt: null,
+      };
+      const updatedAnswers = { name: 'Jane Doe', department: 'sales' };
+      const updatedSubmission = {
+        ...existingSubmission,
+        answers: updatedAnswers,
+        updatedAt: now,
+      };
+
+      mockSubmissionRepo.findById.mockResolvedValue(existingSubmission);
+      mockQuestionnaireRepo.findByIdAndVersion.mockResolvedValue(questionnaire);
+      mockSubmissionRepo.update.mockResolvedValue(updatedSubmission);
+
+      const result = await handleUpdateSubmission(
+        mockQuestionnaireRepo as any,
+        mockSubmissionRepo as any,
+        '123e4567-e89b-12d3-a456-426614174000',
+        { answers: updatedAnswers }
+      );
+
+      expect(result.status).toBe(200);
+      expect(result.data.submission.answers).toEqual(updatedAnswers);
+      expect(mockSubmissionRepo.update).toHaveBeenCalledWith(
+        '123e4567-e89b-12d3-a456-426614174000',
+        { answers: updatedAnswers, metadata: undefined }
+      );
+    });
+
+    it('should update submission metadata only', async () => {
+      const now = new Date();
+      const existingSubmission = {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        questionnaireId: 'onboarding',
+        questionnaireVersion: 1,
+        answers: { name: 'John Doe', department: 'eng' },
+        metadata: {},
+        createdAt: now,
+        updatedAt: null,
+        deletedAt: null,
+      };
+      const updatedMetadata = { source: 'updated', tag: 'test' };
+      const updatedSubmission = {
+        ...existingSubmission,
+        metadata: updatedMetadata,
+        updatedAt: now,
+      };
+
+      mockSubmissionRepo.findById.mockResolvedValue(existingSubmission);
+      mockSubmissionRepo.update.mockResolvedValue(updatedSubmission);
+
+      const result = await handleUpdateSubmission(
+        mockQuestionnaireRepo as any,
+        mockSubmissionRepo as any,
+        '123e4567-e89b-12d3-a456-426614174000',
+        { metadata: updatedMetadata }
+      );
+
+      expect(result.status).toBe(200);
+      expect(result.data.submission.metadata).toEqual(updatedMetadata);
+      // Should not fetch questionnaire when only updating metadata
+      expect(mockQuestionnaireRepo.findByIdAndVersion).not.toHaveBeenCalled();
+    });
+
+    it('should throw NotFoundError if submission does not exist', async () => {
+      mockSubmissionRepo.findById.mockResolvedValue(null);
+
+      await expect(
+        handleUpdateSubmission(
+          mockQuestionnaireRepo as any,
+          mockSubmissionRepo as any,
+          'nonexistent-id',
+          { answers: {} }
+        )
+      ).rejects.toThrow(NotFoundError);
+      await expect(
+        handleUpdateSubmission(
+          mockQuestionnaireRepo as any,
+          mockSubmissionRepo as any,
+          'nonexistent-id',
+          { answers: {} }
+        )
+      ).rejects.toThrow('Submission with id "nonexistent-id" not found');
+    });
+
+    it('should throw ValidationError for invalid answers', async () => {
+      const now = new Date();
+      const questionnaire = { ...sampleQuestionnaire, version: 1, createdAt: now, metadata: {} };
+      const existingSubmission = {
+        id: '123e4567-e89b-12d3-a456-426614174000',
+        questionnaireId: 'onboarding',
+        questionnaireVersion: 1,
+        answers: { name: 'John Doe', department: 'eng' },
+        metadata: {},
+        createdAt: now,
+        updatedAt: null,
+        deletedAt: null,
+      };
+
+      mockSubmissionRepo.findById.mockResolvedValue(existingSubmission);
+      mockQuestionnaireRepo.findByIdAndVersion.mockResolvedValue(questionnaire);
+
+      await expect(
+        handleUpdateSubmission(
+          mockQuestionnaireRepo as any,
+          mockSubmissionRepo as any,
+          '123e4567-e89b-12d3-a456-426614174000',
+          { answers: { name: '', department: 'invalid' } }
+        )
+      ).rejects.toThrow(ValidationError);
+
+      expect(mockSubmissionRepo.update).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('handleDeleteSubmission', () => {
+    it('should soft delete submission and return 200', async () => {
+      mockSubmissionRepo.softDelete.mockResolvedValue(undefined);
+
+      const result = await handleDeleteSubmission(
+        mockSubmissionRepo as any,
+        '123e4567-e89b-12d3-a456-426614174000'
+      );
+
+      expect(result.status).toBe(200);
+      expect(result.data.message).toBe('Submission deleted successfully');
+      expect(mockSubmissionRepo.softDelete).toHaveBeenCalledWith(
+        '123e4567-e89b-12d3-a456-426614174000'
+      );
+    });
+
+    it('should throw NotFoundError if submission does not exist', async () => {
+      mockSubmissionRepo.softDelete.mockRejectedValue(
+        new NotFoundError('Submission "nonexistent-id" not found')
+      );
+
+      await expect(
+        handleDeleteSubmission(mockSubmissionRepo as any, 'nonexistent-id')
+      ).rejects.toThrow(NotFoundError);
+      await expect(
+        handleDeleteSubmission(mockSubmissionRepo as any, 'nonexistent-id')
+      ).rejects.toThrow('Submission "nonexistent-id" not found');
     });
   });
 });

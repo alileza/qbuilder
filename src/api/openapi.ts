@@ -483,6 +483,86 @@ export const openApiSpec = {
           '404': { $ref: '#/components/responses/NotFoundError' },
         },
       },
+      put: {
+        summary: 'Update a submission',
+        tags: ['Submissions'],
+        parameters: [
+          {
+            name: 'submissionId',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' },
+            description: 'Submission ID',
+          },
+        ],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  answers: {
+                    type: 'object',
+                    additionalProperties: true,
+                    description: 'Updated answer payload',
+                  },
+                  metadata: {
+                    $ref: '#/components/schemas/Metadata',
+                    description: 'Updated metadata',
+                  },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': {
+            description: 'Submission updated',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    submission: { $ref: '#/components/schemas/Submission' },
+                  },
+                },
+              },
+            },
+          },
+          '400': { $ref: '#/components/responses/ValidationError' },
+          '404': { $ref: '#/components/responses/NotFoundError' },
+        },
+      },
+      delete: {
+        summary: 'Delete a submission (soft delete)',
+        tags: ['Submissions'],
+        parameters: [
+          {
+            name: 'submissionId',
+            in: 'path',
+            required: true,
+            schema: { type: 'string', format: 'uuid' },
+            description: 'Submission ID',
+          },
+        ],
+        responses: {
+          '200': {
+            description: 'Submission deleted',
+            content: {
+              'application/json': {
+                schema: {
+                  type: 'object',
+                  properties: {
+                    message: { type: 'string' },
+                  },
+                },
+              },
+            },
+          },
+          '404': { $ref: '#/components/responses/NotFoundError' },
+        },
+      },
     },
   },
   components: {
@@ -639,6 +719,8 @@ export const openApiSpec = {
           answers: { type: 'object', additionalProperties: true },
           metadata: { $ref: '#/components/schemas/Metadata' },
           createdAt: { type: 'string', format: 'date-time' },
+          updatedAt: { type: 'string', format: 'date-time', nullable: true },
+          deletedAt: { type: 'string', format: 'date-time', nullable: true },
         },
       },
       Metadata: {
