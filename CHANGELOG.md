@@ -73,6 +73,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+#### Hidden Questions
+- **Hidden field**: Questions can be marked as `hidden: true` to make them permanently invisible to users
+- Hidden questions are evaluated before `visibleIf` conditions
+- Useful for internal tracking, calculated values, and system-generated data
+- Full OpenAPI documentation and test coverage
+
+#### Submission Update & Soft Delete
+- **Update submission**: `PUT /submissions/:id` endpoint to update answers and metadata
+- **Soft delete**: `DELETE /submissions/:id` endpoint performs soft delete (sets `deletedAt` timestamp)
+- Database migration for `updated_at` and `deleted_at` columns
+- All queries automatically exclude soft-deleted records
+- `SubmissionRepository.update()` method with answer validation against questionnaire
+- `SubmissionRepository.softDelete()` method
+- Full OpenAPI documentation and test coverage (319 total tests)
+
 #### Initialization Module
 - **File-Based Initialization**: Load questionnaires from JSON files during startup
 - `initializeQuestionnaires`: Batch load questionnaires from files, directories, or inline definitions

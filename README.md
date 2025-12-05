@@ -2,7 +2,7 @@
 
 A modular, type-safe questionnaire engine for Node.js with branching logic, validation, and versioning support.
 
-[![Tests](https://img.shields.io/badge/tests-298%20passing-brightgreen)](https://github.com/alileza/qbuilder)
+[![Tests](https://img.shields.io/badge/tests-319%20passing-brightgreen)](https://github.com/alileza/qbuilder)
 [![Coverage](https://img.shields.io/badge/coverage-88%25-green)](https://github.com/alileza/qbuilder)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.x-blue)](https://www.typescriptlang.org/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
@@ -19,7 +19,7 @@ A modular, type-safe questionnaire engine for Node.js with branching logic, vali
 - 📋 **Metadata Support**: Store arbitrary metadata with questionnaires and submissions
 - 🚀 **REST API**: Ready-to-use Express router with OpenAPI specification
 - 📝 **TypeScript**: Full type safety and IntelliSense support
-- 🧪 **Well Tested**: 298 tests with 88% coverage
+- 🧪 **Well Tested**: 319 tests with 88% coverage
 
 ## Installation
 
@@ -90,6 +90,12 @@ const questionnaire = parseQuestionnaire({
           { questionId: 'hasJob', operator: 'equals', value: 'yes' }
         ],
       },
+    },
+    {
+      id: 'internalTracking',
+      type: 'text',
+      label: 'Internal ID',
+      hidden: true, // Never visible to users, for internal use
     },
   ],
 });
@@ -401,6 +407,8 @@ app.listen(3000, () => {
 | `POST` | `/questionnaires/:id/submissions` | Submit answers |
 | `GET` | `/questionnaires/:id/submissions` | List submissions |
 | `GET` | `/submissions/:submissionId` | Get a submission |
+| `PUT` | `/submissions/:submissionId` | Update a submission |
+| `DELETE` | `/submissions/:submissionId` | Delete a submission (soft delete) |
 | `GET` | `/openapi.json` | Get OpenAPI 3.0 specification |
 
 ### OpenAPI/Swagger
@@ -415,6 +423,25 @@ console.log(openApiSpec.info.version);
 ```
 
 ## Branching Logic
+
+### Hidden Questions
+
+Questions can be marked as `hidden: true` to make them permanently invisible to users, regardless of any `visibleIf` conditions:
+
+```typescript
+{
+  id: 'internalScore',
+  type: 'text',
+  label: 'Internal Score',
+  hidden: true, // Never visible, useful for internal tracking
+}
+```
+
+Hidden questions are useful for:
+- Internal tracking fields
+- Calculated values
+- System-generated data
+- Fields populated by integrations
 
 ### Condition Operators
 
@@ -677,6 +704,8 @@ Creates a repository for managing submissions.
 - `create(questionnaireId, version, answers, options?)` - Store submission (options: `{ metadata?: object }`)
 - `findById(submissionId)` - Get submission (includes metadata)
 - `listByQuestionnaire(id, options)` - List with pagination
+- `update(submissionId, options)` - Update submission (options: `{ answers?, metadata? }`)
+- `softDelete(submissionId)` - Soft delete submission (sets deletedAt timestamp)
 
 ### API Functions
 
