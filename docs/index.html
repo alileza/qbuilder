@@ -328,6 +328,44 @@
             display: none;
         }
 
+        .question.disabled {
+            opacity: 0.6;
+        }
+
+        .question.disabled .question-label {
+            color: #888;
+        }
+
+        .question.disabled input,
+        .question.disabled textarea,
+        .question.disabled .choice-option {
+            pointer-events: none;
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+
+        .question.disabled .choice-option {
+            border-color: #e0e0e0;
+        }
+
+        .disabled-reason {
+            font-size: 12px;
+            color: #888;
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 8px 12px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .disabled-reason::before {
+            content: "ℹ️";
+            font-size: 14px;
+        }
+
         .question-label {
             display: block;
             font-weight: 600;
@@ -1336,15 +1374,62 @@
             progressFill.style.width = `${progress}%`;
         }
 
+        function getDisabledReason(question) {
+            if (!question.visibleIf) return null;
+            const { all = [], any = [] } = question.visibleIf;
+
+            const unmetConditions = [];
+
+            // Check 'all' conditions - all must be true
+            for (const condition of all) {
+                if (!evaluateCondition(condition)) {
+                    unmetConditions.push(formatCondition(condition));
+                }
+            }
+
+            // Check 'any' conditions - at least one must be true
+            if (any.length > 0 && !any.some(c => evaluateCondition(c))) {
+                const anyDescriptions = any.map(c => formatCondition(c));
+                unmetConditions.push(`one of: ${anyDescriptions.join(' OR ')}`);
+            }
+
+            return unmetConditions.length > 0 ? unmetConditions.join(', ') : null;
+        }
+
+        function formatCondition(condition) {
+            const { questionId, operator, value } = condition;
+            const refQuestion = questionnaire.questions.find(q => q.id === questionId);
+            const qLabel = refQuestion ? `"${refQuestion.label.substring(0, 40)}${refQuestion.label.length > 40 ? '...' : ''}"` : questionId;
+
+            switch (operator) {
+                case 'isAnswered': return `${qLabel} is answered`;
+                case 'notAnswered': return `${qLabel} is not answered`;
+                case 'equals': return `${qLabel} = "${value}"`;
+                case 'notEquals': return `${qLabel} ≠ "${value}"`;
+                case 'in': return `${qLabel} is one of [${Array.isArray(value) ? value.join(', ') : value}]`;
+                case 'notIn': return `${qLabel} is not in [${Array.isArray(value) ? value.join(', ') : value}]`;
+                case 'gt': return `${qLabel} > ${value}`;
+                case 'gte': return `${qLabel} >= ${value}`;
+                case 'lt': return `${qLabel} < ${value}`;
+                case 'lte': return `${qLabel} <= ${value}`;
+                default: return `${qLabel} ${operator} ${value}`;
+            }
+        }
+
         function renderQuestion(question) {
             const isVisible = evaluateVisibility(question);
-            const hiddenClass = isVisible ? '' : 'hidden';
+            const disabledClass = isVisible ? '' : 'disabled';
+            const disabledReason = isVisible ? null : getDisabledReason(question);
 
-            let html = `<div class="question ${hiddenClass}" data-question-id="${question.id}">`;
+            let html = `<div class="question ${disabledClass}" data-question-id="${question.id}">`;
             html += `<label class="question-label">${escapeHtml(question.label)}${question.required ? '<span class="required">*</span>' : ''}</label>`;
 
             if (question.helpText) {
                 html += `<p class="help-text">${escapeHtml(question.helpText)}</p>`;
+            }
+
+            if (disabledReason) {
+                html += `<div class="disabled-reason">Requires: ${escapeHtml(disabledReason)}</div>`;
             }
 
             if (question.type === 'text') {
@@ -1517,7 +1602,34 @@
             if (!questionnaire) return;
             for (const question of questionnaire.questions || []) {
                 const el = document.querySelector(`[data-question-id="${question.id}"]`);
-                if (el) el.classList.toggle('hidden', !evaluateVisibility(question));
+                if (!el) continue;
+
+                const isVisible = evaluateVisibility(question);
+                el.classList.toggle('disabled', !isVisible);
+
+                // Update or remove the disabled reason
+                let reasonEl = el.querySelector('.disabled-reason');
+                if (!isVisible) {
+                    const reason = getDisabledReason(question);
+                    if (reason) {
+                        if (!reasonEl) {
+                            reasonEl = document.createElement('div');
+                            reasonEl.className = 'disabled-reason';
+                            // Insert after help-text if exists, otherwise after label
+                            const helpText = el.querySelector('.help-text');
+                            const label = el.querySelector('.question-label');
+                            const insertAfter = helpText || label;
+                            if (insertAfter && insertAfter.nextSibling) {
+                                el.insertBefore(reasonEl, insertAfter.nextSibling);
+                            } else if (insertAfter) {
+                                insertAfter.after(reasonEl);
+                            }
+                        }
+                        reasonEl.textContent = `Requires: ${reason}`;
+                    }
+                } else if (reasonEl) {
+                    reasonEl.remove();
+                }
             }
         }
 
