@@ -742,6 +742,504 @@
             display: none;
         }
 
+        /* Mode tabs */
+        .mode-tabs {
+            display: flex;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 0;
+            background: #f8f9fa;
+        }
+
+        .mode-tab {
+            flex: 1;
+            padding: 10px 16px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            color: #666;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+
+        .mode-tab:hover {
+            color: #333;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .mode-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+            background: #fff;
+        }
+
+        .mode-tab svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Builder styles */
+        .builder-container {
+            display: none;
+            flex-direction: column;
+            height: 100%;
+            overflow: auto;
+        }
+
+        .builder-container.active {
+            display: flex;
+        }
+
+        #json-input.hidden {
+            display: none;
+        }
+
+        .builder-header {
+            padding: 16px;
+            border-bottom: 1px solid #e0e0e0;
+            background: #fff;
+        }
+
+        .builder-meta {
+            display: grid;
+            gap: 12px;
+        }
+
+        .builder-meta-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .builder-field {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .builder-field label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #666;
+            text-transform: uppercase;
+        }
+
+        .builder-field input {
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 13px;
+        }
+
+        .builder-field input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .builder-sections {
+            padding: 16px;
+            flex: 1;
+            overflow: auto;
+        }
+
+        .builder-section {
+            background: #f8f9fa;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+
+        .builder-section-header {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            background: #fff;
+            border-radius: 8px 8px 0 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .builder-section-header:hover {
+            background: #f8f9fa;
+        }
+
+        .builder-section-title {
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .builder-section-title .drag-handle {
+            color: #999;
+            cursor: grab;
+        }
+
+        .builder-section-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .builder-section-actions button {
+            padding: 4px 8px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #666;
+            border-radius: 4px;
+        }
+
+        .builder-section-actions button:hover {
+            background: #e0e0e0;
+            color: #333;
+        }
+
+        .builder-section-actions button.delete:hover {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .builder-questions {
+            padding: 12px;
+        }
+
+        .builder-question {
+            background: #fff;
+            border: 1px solid #e0e0e0;
+            border-radius: 6px;
+            padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+
+        .builder-question:last-child {
+            margin-bottom: 0;
+        }
+
+        .builder-question:hover {
+            border-color: #667eea;
+        }
+
+        .builder-question-drag {
+            color: #ccc;
+            cursor: grab;
+            padding: 4px;
+        }
+
+        .builder-question-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .builder-question-label {
+            font-weight: 500;
+            font-size: 13px;
+            margin-bottom: 4px;
+            word-break: break-word;
+        }
+
+        .builder-question-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .builder-question-badge {
+            font-size: 11px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .builder-question-badge.type {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .builder-question-badge.required {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        .builder-question-badge.conditional {
+            background: #fff3e0;
+            color: #ef6c00;
+        }
+
+        .builder-question-actions {
+            display: flex;
+            gap: 4px;
+        }
+
+        .builder-question-actions button {
+            padding: 6px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #999;
+            border-radius: 4px;
+        }
+
+        .builder-question-actions button:hover {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .builder-question-actions button.delete:hover {
+            background: #ffebee;
+            color: #d32f2f;
+        }
+
+        .builder-add-btn {
+            width: 100%;
+            padding: 10px;
+            background: none;
+            border: 2px dashed #ddd;
+            border-radius: 6px;
+            color: #666;
+            cursor: pointer;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all 0.2s;
+        }
+
+        .builder-add-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+            background: rgba(102, 126, 234, 0.05);
+        }
+
+        .builder-add-section-btn {
+            margin: 16px;
+            margin-top: 0;
+        }
+
+        /* Question Editor Modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #fff;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-size: 18px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+            padding: 4px;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .modal-body {
+            padding: 20px;
+            overflow: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: #333;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: vertical;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .form-checkbox {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-checkbox input {
+            width: auto;
+        }
+
+        .options-editor {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .option-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            align-items: center;
+        }
+
+        .option-row input {
+            flex: 1;
+            padding: 8px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .option-row button {
+            padding: 6px 10px;
+            background: none;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .option-row button:hover {
+            background: #f5f5f5;
+        }
+
+        .option-row button.delete {
+            color: #d32f2f;
+            border-color: #ffcdd2;
+        }
+
+        .option-row button.delete:hover {
+            background: #ffebee;
+        }
+
+        .add-option-btn {
+            width: 100%;
+            padding: 8px;
+            background: none;
+            border: 1px dashed #ddd;
+            border-radius: 4px;
+            cursor: pointer;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .add-option-btn:hover {
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .visibleif-editor {
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 12px;
+        }
+
+        .condition-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .condition-row select,
+        .condition-row input {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .condition-row select {
+            min-width: 120px;
+        }
+
+        .condition-row input {
+            flex: 1;
+            min-width: 100px;
+        }
+
         /* Status indicator */
         .status-indicator {
             display: flex;
@@ -826,8 +1324,118 @@
                     </button>
                 </div>
             </div>
+            <div class="mode-tabs">
+                <button class="mode-tab active" onclick="setEditorMode('code')" id="codeTab">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+                    Code
+                </button>
+                <button class="mode-tab" onclick="setEditorMode('builder')" id="builderTab">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                    Builder
+                </button>
+            </div>
             <div class="panel-content">
                 <textarea id="json-input" placeholder="Paste your questionnaire JSON here, or use Import/Examples above..." spellcheck="false"></textarea>
+                <div class="builder-container" id="builderContainer"></div>
+            </div>
+        </div>
+
+        <!-- Question Editor Modal -->
+        <div class="modal-overlay" id="questionModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 id="modalTitle">Add Question</h3>
+                    <button class="modal-close" onclick="closeQuestionModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Question ID *</label>
+                        <input type="text" id="qId" placeholder="e.g., user-name" />
+                    </div>
+                    <div class="form-group">
+                        <label>Label *</label>
+                        <input type="text" id="qLabel" placeholder="e.g., What is your name?" />
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>Type *</label>
+                            <select id="qType" onchange="toggleTypeOptions()">
+                                <option value="text">Text</option>
+                                <option value="choice">Choice</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>&nbsp;</label>
+                            <div class="form-checkbox">
+                                <input type="checkbox" id="qRequired" />
+                                <label for="qRequired" style="margin: 0; font-weight: normal;">Required</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Help Text</label>
+                        <input type="text" id="qHelpText" placeholder="Optional hint for users" />
+                    </div>
+                    <div class="form-group" id="textOptionsGroup">
+                        <div class="form-row">
+                            <div class="form-group" style="margin: 0;">
+                                <label>Max Length</label>
+                                <input type="number" id="qMaxLength" placeholder="e.g., 500" />
+                            </div>
+                            <div class="form-group" style="margin: 0;">
+                                <label>&nbsp;</label>
+                                <div class="form-checkbox">
+                                    <input type="checkbox" id="qMultiline" />
+                                    <label for="qMultiline" style="margin: 0; font-weight: normal;">Multiline</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group" id="choiceOptionsGroup" style="display: none;">
+                        <label>Options</label>
+                        <div class="options-editor" id="optionsEditor"></div>
+                        <div class="form-checkbox" style="margin-top: 8px;">
+                            <input type="checkbox" id="qMultiple" />
+                            <label for="qMultiple" style="margin: 0; font-weight: normal;">Allow multiple selections</label>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Visible If (Conditions)</label>
+                        <div class="visibleif-editor" id="visibleIfEditor"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeQuestionModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveQuestion()">Save Question</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Editor Modal -->
+        <div class="modal-overlay" id="sectionModal">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 id="sectionModalTitle">Add Section</h3>
+                    <button class="modal-close" onclick="closeSectionModal()">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label>Section ID *</label>
+                        <input type="text" id="sId" placeholder="e.g., personal-info" />
+                    </div>
+                    <div class="form-group">
+                        <label>Title *</label>
+                        <input type="text" id="sTitle" placeholder="e.g., Personal Information" />
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea id="sDescription" placeholder="Optional section description"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" onclick="closeSectionModal()">Cancel</button>
+                    <button class="btn btn-primary" onclick="saveSection()">Save Section</button>
+                </div>
             </div>
         </div>
 
@@ -863,12 +1471,21 @@
         let questionnaire = null;
         let answers = {};
         let currentSectionIndex = 0;
+        let editorMode = 'code';
+        let editingQuestionId = null;
+        let editingSectionId = null;
+        let editingInSection = null;
+        let questionOptions = [];
+        let questionConditions = [];
 
         // DOM Elements
         const jsonInput = document.getElementById('json-input');
         const preview = document.getElementById('preview');
         const statusDot = document.getElementById('statusDot');
         const statusText = document.getElementById('statusText');
+        const builderContainer = document.getElementById('builderContainer');
+        const codeTab = document.getElementById('codeTab');
+        const builderTab = document.getElementById('builderTab');
 
         // Example questionnaires
         const examples = {
@@ -1676,6 +2293,530 @@
                 document.body.style.cursor = '';
                 document.body.style.userSelect = '';
             });
+        }
+
+        // Builder Mode Functions
+        function setEditorMode(mode) {
+            editorMode = mode;
+            codeTab.classList.toggle('active', mode === 'code');
+            builderTab.classList.toggle('active', mode === 'builder');
+            jsonInput.classList.toggle('hidden', mode === 'builder');
+            builderContainer.classList.toggle('active', mode === 'builder');
+
+            if (mode === 'builder') {
+                renderBuilder();
+            } else {
+                // Sync any changes from builder to JSON
+                if (questionnaire) {
+                    jsonInput.value = JSON.stringify(questionnaire, null, 2);
+                }
+            }
+        }
+
+        function renderBuilder() {
+            if (!questionnaire) {
+                questionnaire = {
+                    id: 'new-questionnaire',
+                    title: 'New Questionnaire',
+                    description: '',
+                    questions: [],
+                    sections: []
+                };
+                syncJsonFromBuilder();
+            }
+
+            let html = `
+                <div class="builder-header">
+                    <div class="builder-meta">
+                        <div class="builder-meta-row">
+                            <div class="builder-field">
+                                <label>ID</label>
+                                <input type="text" value="${escapeHtml(questionnaire.id || '')}" onchange="updateMeta('id', this.value)" />
+                            </div>
+                            <div class="builder-field">
+                                <label>Title</label>
+                                <input type="text" value="${escapeHtml(questionnaire.title || '')}" onchange="updateMeta('title', this.value)" />
+                            </div>
+                        </div>
+                        <div class="builder-field">
+                            <label>Description</label>
+                            <input type="text" value="${escapeHtml(questionnaire.description || '')}" onchange="updateMeta('description', this.value)" />
+                        </div>
+                    </div>
+                </div>
+                <div class="builder-sections">
+            `;
+
+            if (questionnaire.sections && questionnaire.sections.length > 0) {
+                for (const section of questionnaire.sections) {
+                    html += renderBuilderSection(section);
+                }
+            } else {
+                // No sections - show all questions
+                html += `
+                    <div class="builder-section">
+                        <div class="builder-section-header" style="border-radius: 8px;">
+                            <div class="builder-section-title">All Questions</div>
+                            <div class="builder-section-actions">
+                                <button onclick="openSectionModal()" title="Add section to organize">+ Add Section</button>
+                            </div>
+                        </div>
+                        <div class="builder-questions">
+                `;
+                for (const q of questionnaire.questions || []) {
+                    html += renderBuilderQuestion(q);
+                }
+                html += `
+                            <button class="builder-add-btn" onclick="openQuestionModal(null)">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                                Add Question
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+
+            if (questionnaire.sections && questionnaire.sections.length > 0) {
+                html += `
+                    <button class="builder-add-btn builder-add-section-btn" onclick="openSectionModal()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                        Add Section
+                    </button>
+                `;
+            }
+
+            html += `</div>`;
+            builderContainer.innerHTML = html;
+        }
+
+        function renderBuilderSection(section) {
+            const sectionQuestions = getSectionQuestionsForBuilder(section);
+            let html = `
+                <div class="builder-section" data-section-id="${section.id}">
+                    <div class="builder-section-header">
+                        <div class="builder-section-title">
+                            <svg class="drag-handle" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                            ${escapeHtml(section.title)}
+                            ${section.description ? `<span style="font-weight: normal; color: #888; font-size: 12px;">- ${escapeHtml(section.description)}</span>` : ''}
+                        </div>
+                        <div class="builder-section-actions">
+                            <button onclick="openSectionModal('${section.id}')" title="Edit section">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                            </button>
+                            <button class="delete" onclick="deleteSection('${section.id}')" title="Delete section">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="builder-questions">
+            `;
+
+            for (const q of sectionQuestions) {
+                html += renderBuilderQuestion(q, section.id);
+            }
+
+            html += `
+                        <button class="builder-add-btn" onclick="openQuestionModal(null, '${section.id}')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                            Add Question
+                        </button>
+                    </div>
+                </div>
+            `;
+            return html;
+        }
+
+        function getSectionQuestionsForBuilder(section) {
+            const explicitIds = new Set(section.questionIds || []);
+            return (section.questionIds || [])
+                .map(id => questionnaire.questions.find(q => q.id === id))
+                .filter(Boolean);
+        }
+
+        function renderBuilderQuestion(q, sectionId = null) {
+            const badges = [];
+            badges.push(`<span class="builder-question-badge type">${q.type}</span>`);
+            if (q.required) badges.push(`<span class="builder-question-badge required">required</span>`);
+            if (q.visibleIf) badges.push(`<span class="builder-question-badge conditional">conditional</span>`);
+
+            return `
+                <div class="builder-question" data-question-id="${q.id}">
+                    <div class="builder-question-drag">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </div>
+                    <div class="builder-question-info">
+                        <div class="builder-question-label">${escapeHtml(q.label)}</div>
+                        <div class="builder-question-meta">
+                            <span class="builder-question-badge">${q.id}</span>
+                            ${badges.join('')}
+                        </div>
+                    </div>
+                    <div class="builder-question-actions">
+                        <button onclick="openQuestionModal('${q.id}'${sectionId ? `, '${sectionId}'` : ', null'})" title="Edit question">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                        </button>
+                        <button class="delete" onclick="deleteQuestion('${q.id}')" title="Delete question">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function updateMeta(field, value) {
+            questionnaire[field] = value;
+            syncJsonFromBuilder();
+        }
+
+        function syncJsonFromBuilder() {
+            jsonInput.value = JSON.stringify(questionnaire, null, 2);
+            parseAndRender();
+        }
+
+        // Question Modal Functions
+        function openQuestionModal(questionId = null, sectionId = null) {
+            editingQuestionId = questionId;
+            editingInSection = sectionId;
+            const modal = document.getElementById('questionModal');
+            const title = document.getElementById('modalTitle');
+
+            if (questionId) {
+                title.textContent = 'Edit Question';
+                const q = questionnaire.questions.find(q => q.id === questionId);
+                if (q) {
+                    document.getElementById('qId').value = q.id;
+                    document.getElementById('qLabel').value = q.label;
+                    document.getElementById('qType').value = q.type;
+                    document.getElementById('qRequired').checked = q.required || false;
+                    document.getElementById('qHelpText').value = q.helpText || '';
+                    document.getElementById('qMaxLength').value = q.maxLength || '';
+                    document.getElementById('qMultiline').checked = q.multiline || false;
+                    document.getElementById('qMultiple').checked = q.multiple || false;
+                    questionOptions = q.options ? [...q.options] : [];
+                    questionConditions = q.visibleIf ? extractConditions(q.visibleIf) : [];
+                }
+            } else {
+                title.textContent = 'Add Question';
+                document.getElementById('qId').value = '';
+                document.getElementById('qLabel').value = '';
+                document.getElementById('qType').value = 'text';
+                document.getElementById('qRequired').checked = false;
+                document.getElementById('qHelpText').value = '';
+                document.getElementById('qMaxLength').value = '';
+                document.getElementById('qMultiline').checked = false;
+                document.getElementById('qMultiple').checked = false;
+                questionOptions = [];
+                questionConditions = [];
+            }
+
+            toggleTypeOptions();
+            renderOptionsEditor();
+            renderVisibleIfEditor();
+            modal.classList.add('active');
+        }
+
+        function closeQuestionModal() {
+            document.getElementById('questionModal').classList.remove('active');
+            editingQuestionId = null;
+            editingInSection = null;
+        }
+
+        function toggleTypeOptions() {
+            const type = document.getElementById('qType').value;
+            document.getElementById('textOptionsGroup').style.display = type === 'text' ? 'block' : 'none';
+            document.getElementById('choiceOptionsGroup').style.display = type === 'choice' ? 'block' : 'none';
+        }
+
+        function renderOptionsEditor() {
+            let html = '';
+            questionOptions.forEach((opt, i) => {
+                html += `
+                    <div class="option-row">
+                        <input type="text" value="${escapeHtml(opt.value)}" placeholder="Value" onchange="updateOption(${i}, 'value', this.value)" />
+                        <input type="text" value="${escapeHtml(opt.label)}" placeholder="Label" onchange="updateOption(${i}, 'label', this.value)" />
+                        <button class="delete" onclick="removeOption(${i})">&times;</button>
+                    </div>
+                `;
+            });
+            html += `<button class="add-option-btn" onclick="addOption()">+ Add Option</button>`;
+            document.getElementById('optionsEditor').innerHTML = html;
+        }
+
+        function addOption() {
+            questionOptions.push({ value: '', label: '' });
+            renderOptionsEditor();
+        }
+
+        function updateOption(index, field, value) {
+            questionOptions[index][field] = value;
+        }
+
+        function removeOption(index) {
+            questionOptions.splice(index, 1);
+            renderOptionsEditor();
+        }
+
+        function extractConditions(visibleIf) {
+            const conditions = [];
+            if (visibleIf.all) {
+                visibleIf.all.forEach(c => conditions.push({ ...c, logic: 'all' }));
+            }
+            if (visibleIf.any) {
+                visibleIf.any.forEach(c => conditions.push({ ...c, logic: 'any' }));
+            }
+            return conditions;
+        }
+
+        function renderVisibleIfEditor() {
+            const questions = questionnaire.questions || [];
+            let html = '';
+
+            questionConditions.forEach((cond, i) => {
+                html += `
+                    <div class="condition-row">
+                        <select onchange="updateCondition(${i}, 'logic', this.value)">
+                            <option value="all" ${cond.logic === 'all' ? 'selected' : ''}>AND</option>
+                            <option value="any" ${cond.logic === 'any' ? 'selected' : ''}>OR</option>
+                        </select>
+                        <select onchange="updateCondition(${i}, 'questionId', this.value)">
+                            <option value="">Select question...</option>
+                            ${questions.map(q => `<option value="${q.id}" ${cond.questionId === q.id ? 'selected' : ''}>${q.id}</option>`).join('')}
+                        </select>
+                        <select onchange="updateCondition(${i}, 'operator', this.value)">
+                            <option value="equals" ${cond.operator === 'equals' ? 'selected' : ''}>equals</option>
+                            <option value="notEquals" ${cond.operator === 'notEquals' ? 'selected' : ''}>not equals</option>
+                            <option value="isAnswered" ${cond.operator === 'isAnswered' ? 'selected' : ''}>is answered</option>
+                            <option value="notAnswered" ${cond.operator === 'notAnswered' ? 'selected' : ''}>not answered</option>
+                            <option value="in" ${cond.operator === 'in' ? 'selected' : ''}>in</option>
+                            <option value="gt" ${cond.operator === 'gt' ? 'selected' : ''}>greater than</option>
+                            <option value="gte" ${cond.operator === 'gte' ? 'selected' : ''}>greater or equal</option>
+                            <option value="lt" ${cond.operator === 'lt' ? 'selected' : ''}>less than</option>
+                            <option value="lte" ${cond.operator === 'lte' ? 'selected' : ''}>less or equal</option>
+                        </select>
+                        ${!['isAnswered', 'notAnswered'].includes(cond.operator) ?
+                            `<input type="text" value="${escapeHtml(cond.value || '')}" placeholder="Value" onchange="updateCondition(${i}, 'value', this.value)" />` : ''}
+                        <button class="delete" onclick="removeCondition(${i})">&times;</button>
+                    </div>
+                `;
+            });
+
+            html += `<button class="add-option-btn" onclick="addCondition()">+ Add Condition</button>`;
+            document.getElementById('visibleIfEditor').innerHTML = html;
+        }
+
+        function addCondition() {
+            questionConditions.push({ logic: 'all', questionId: '', operator: 'equals', value: '' });
+            renderVisibleIfEditor();
+        }
+
+        function updateCondition(index, field, value) {
+            questionConditions[index][field] = value;
+            if (field === 'operator') {
+                renderVisibleIfEditor();
+            }
+        }
+
+        function removeCondition(index) {
+            questionConditions.splice(index, 1);
+            renderVisibleIfEditor();
+        }
+
+        function saveQuestion() {
+            const id = document.getElementById('qId').value.trim();
+            const label = document.getElementById('qLabel').value.trim();
+            const type = document.getElementById('qType').value;
+
+            if (!id || !label) {
+                showToast('ID and Label are required', 'error');
+                return;
+            }
+
+            // Check for duplicate ID
+            const existingIndex = questionnaire.questions.findIndex(q => q.id === id);
+            if (existingIndex !== -1 && editingQuestionId !== id) {
+                showToast('Question ID already exists', 'error');
+                return;
+            }
+
+            const question = {
+                id,
+                type,
+                label,
+            };
+
+            if (document.getElementById('qRequired').checked) question.required = true;
+            if (document.getElementById('qHelpText').value) question.helpText = document.getElementById('qHelpText').value;
+
+            if (type === 'text') {
+                if (document.getElementById('qMaxLength').value) question.maxLength = parseInt(document.getElementById('qMaxLength').value);
+                if (document.getElementById('qMultiline').checked) question.multiline = true;
+            } else if (type === 'choice') {
+                question.options = questionOptions.filter(o => o.value && o.label);
+                if (document.getElementById('qMultiple').checked) question.multiple = true;
+            }
+
+            // Build visibleIf
+            if (questionConditions.length > 0) {
+                const allConditions = questionConditions.filter(c => c.logic === 'all' && c.questionId);
+                const anyConditions = questionConditions.filter(c => c.logic === 'any' && c.questionId);
+                const visibleIf = {};
+                if (allConditions.length > 0) {
+                    visibleIf.all = allConditions.map(c => {
+                        const cond = { questionId: c.questionId, operator: c.operator };
+                        if (!['isAnswered', 'notAnswered'].includes(c.operator) && c.value) {
+                            cond.value = c.value;
+                        }
+                        return cond;
+                    });
+                }
+                if (anyConditions.length > 0) {
+                    visibleIf.any = anyConditions.map(c => {
+                        const cond = { questionId: c.questionId, operator: c.operator };
+                        if (!['isAnswered', 'notAnswered'].includes(c.operator) && c.value) {
+                            cond.value = c.value;
+                        }
+                        return cond;
+                    });
+                }
+                if (Object.keys(visibleIf).length > 0) {
+                    question.visibleIf = visibleIf;
+                }
+            }
+
+            if (editingQuestionId) {
+                // Update existing question
+                const idx = questionnaire.questions.findIndex(q => q.id === editingQuestionId);
+                if (idx !== -1) {
+                    questionnaire.questions[idx] = question;
+                }
+                // Update section reference if ID changed
+                if (editingQuestionId !== id && questionnaire.sections) {
+                    for (const section of questionnaire.sections) {
+                        const qIdx = section.questionIds.indexOf(editingQuestionId);
+                        if (qIdx !== -1) {
+                            section.questionIds[qIdx] = id;
+                        }
+                    }
+                }
+            } else {
+                // Add new question
+                questionnaire.questions.push(question);
+                // Add to section if specified
+                if (editingInSection && questionnaire.sections) {
+                    const section = questionnaire.sections.find(s => s.id === editingInSection);
+                    if (section) {
+                        section.questionIds.push(id);
+                    }
+                }
+            }
+
+            closeQuestionModal();
+            syncJsonFromBuilder();
+            renderBuilder();
+            showToast(editingQuestionId ? 'Question updated' : 'Question added', 'success');
+        }
+
+        function deleteQuestion(questionId) {
+            if (!confirm('Delete this question?')) return;
+
+            questionnaire.questions = questionnaire.questions.filter(q => q.id !== questionId);
+
+            // Remove from sections
+            if (questionnaire.sections) {
+                for (const section of questionnaire.sections) {
+                    section.questionIds = section.questionIds.filter(id => id !== questionId);
+                }
+            }
+
+            syncJsonFromBuilder();
+            renderBuilder();
+            showToast('Question deleted', 'success');
+        }
+
+        // Section Modal Functions
+        function openSectionModal(sectionId = null) {
+            editingSectionId = sectionId;
+            const modal = document.getElementById('sectionModal');
+            const title = document.getElementById('sectionModalTitle');
+
+            if (sectionId) {
+                title.textContent = 'Edit Section';
+                const section = questionnaire.sections.find(s => s.id === sectionId);
+                if (section) {
+                    document.getElementById('sId').value = section.id;
+                    document.getElementById('sTitle').value = section.title;
+                    document.getElementById('sDescription').value = section.description || '';
+                }
+            } else {
+                title.textContent = 'Add Section';
+                document.getElementById('sId').value = '';
+                document.getElementById('sTitle').value = '';
+                document.getElementById('sDescription').value = '';
+            }
+
+            modal.classList.add('active');
+        }
+
+        function closeSectionModal() {
+            document.getElementById('sectionModal').classList.remove('active');
+            editingSectionId = null;
+        }
+
+        function saveSection() {
+            const id = document.getElementById('sId').value.trim();
+            const title = document.getElementById('sTitle').value.trim();
+            const description = document.getElementById('sDescription').value.trim();
+
+            if (!id || !title) {
+                showToast('ID and Title are required', 'error');
+                return;
+            }
+
+            if (!questionnaire.sections) {
+                questionnaire.sections = [];
+            }
+
+            const existingIndex = questionnaire.sections.findIndex(s => s.id === id);
+            if (existingIndex !== -1 && editingSectionId !== id) {
+                showToast('Section ID already exists', 'error');
+                return;
+            }
+
+            const section = {
+                id,
+                title,
+                questionIds: []
+            };
+            if (description) section.description = description;
+
+            if (editingSectionId) {
+                const idx = questionnaire.sections.findIndex(s => s.id === editingSectionId);
+                if (idx !== -1) {
+                    section.questionIds = questionnaire.sections[idx].questionIds;
+                    questionnaire.sections[idx] = section;
+                }
+            } else {
+                questionnaire.sections.push(section);
+            }
+
+            closeSectionModal();
+            syncJsonFromBuilder();
+            renderBuilder();
+            showToast(editingSectionId ? 'Section updated' : 'Section added', 'success');
+        }
+
+        function deleteSection(sectionId) {
+            if (!confirm('Delete this section? Questions will not be deleted.')) return;
+
+            questionnaire.sections = questionnaire.sections.filter(s => s.id !== sectionId);
+
+            if (questionnaire.sections.length === 0) {
+                delete questionnaire.sections;
+            }
+
+            syncJsonFromBuilder();
+            renderBuilder();
+            showToast('Section deleted', 'success');
         }
     </script>
 </body>
