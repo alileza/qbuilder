@@ -301,6 +301,46 @@ describe('isQuestionVisible', () => {
     expect(isQuestionVisible(question, answers)).toBe(true);
   });
 
+  it('should return false when question is hidden', () => {
+    const question = {
+      id: 'q1',
+      type: 'text' as const,
+      label: 'Q1',
+      hidden: true,
+    };
+    const answers = {};
+
+    expect(isQuestionVisible(question, answers)).toBe(false);
+  });
+
+  it('should return false for hidden question even with satisfied visibleIf', () => {
+    const question = {
+      id: 'q2',
+      type: 'text' as const,
+      label: 'Q2',
+      hidden: true,
+      visibleIf: {
+        all: [{ questionId: 'q1', operator: 'equals' as const, value: 'yes' }],
+      },
+    };
+    const answers = { q1: 'yes' };
+
+    // Even though visibleIf is satisfied, hidden takes precedence
+    expect(isQuestionVisible(question, answers)).toBe(false);
+  });
+
+  it('should return true when hidden is explicitly false', () => {
+    const question = {
+      id: 'q1',
+      type: 'text' as const,
+      label: 'Q1',
+      hidden: false,
+    };
+    const answers = {};
+
+    expect(isQuestionVisible(question, answers)).toBe(true);
+  });
+
   it('should evaluate all conditions (AND logic)', () => {
     const question = {
       id: 'q2',
@@ -399,6 +439,22 @@ describe('getVisibleQuestions', () => {
 
     const visible = getVisibleQuestions(questionnaire, {});
     expect(visible.length).toBe(2);
+  });
+
+  it('should filter out hidden questions', () => {
+    const questionnaire: QuestionnaireDefinition = {
+      id: 'survey',
+      title: 'Survey',
+      questions: [
+        { id: 'q1', type: 'text', label: 'Q1' },
+        { id: 'q2', type: 'text', label: 'Q2', hidden: true },
+        { id: 'q3', type: 'text', label: 'Q3' },
+      ],
+    };
+
+    const visible = getVisibleQuestions(questionnaire, {});
+    expect(visible.length).toBe(2);
+    expect(visible.map((q) => q.id)).toEqual(['q1', 'q3']);
   });
 
   it('should filter out invisible questions', () => {

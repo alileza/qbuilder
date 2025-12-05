@@ -72,12 +72,17 @@ export function evaluateCondition(
 }
 
 /**
- * Check if a question is visible based on its visibleIf conditions
+ * Check if a question is visible based on its hidden flag and visibleIf conditions
  */
 export function isQuestionVisible(
   question: QuestionDefinition,
   answers: AnswerPayload
 ): boolean {
+  // If question is marked as hidden, it's never visible to users
+  if (question.hidden) {
+    return false;
+  }
+
   // If no visibleIf, question is always visible
   if (!question.visibleIf) {
     return true;

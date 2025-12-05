@@ -175,6 +175,35 @@ describe('TextQuestionSchema', () => {
     const result = TextQuestionSchema.safeParse(conditionalQuestion);
     expect(result.success).toBe(true);
   });
+
+  it('should accept hidden flag', () => {
+    const hiddenQuestion = {
+      id: 'q1',
+      type: 'text',
+      label: 'Hidden field',
+      hidden: true,
+    };
+
+    const result = TextQuestionSchema.safeParse(hiddenQuestion);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.hidden).toBe(true);
+    }
+  });
+
+  it('should default hidden to false', () => {
+    const question = {
+      id: 'q1',
+      type: 'text',
+      label: 'Normal question',
+    };
+
+    const result = TextQuestionSchema.safeParse(question);
+    expect(result.success).toBe(true);
+    if (result.success) {
+      expect(result.data.hidden).toBe(false);
+    }
+  });
 });
 
 describe('ChoiceQuestionSchema', () => {

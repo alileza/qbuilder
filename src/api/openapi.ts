@@ -573,6 +573,7 @@ export const openApiSpec = {
           multiline: { type: 'boolean', default: false },
           maxLength: { type: 'integer' },
           visibleIf: { $ref: '#/components/schemas/VisibleIf' },
+          hidden: { type: 'boolean', default: false, description: 'If true, question is never shown to users' },
         },
       },
       ChoiceQuestion: {
@@ -590,6 +591,7 @@ export const openApiSpec = {
             items: { $ref: '#/components/schemas/ChoiceOption' },
           },
           visibleIf: { $ref: '#/components/schemas/VisibleIf' },
+          hidden: { type: 'boolean', default: false, description: 'If true, question is never shown to users' },
         },
       },
       ChoiceOption: {

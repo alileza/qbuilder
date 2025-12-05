@@ -10,6 +10,7 @@ const BaseQuestionSchema = z.object({
   required: z.boolean().optional().default(false),
   helpText: z.string().optional(),
   visibleIf: VisibleIfSchema.optional(),
+  hidden: z.boolean().optional().default(false),
 });
 
 /**
